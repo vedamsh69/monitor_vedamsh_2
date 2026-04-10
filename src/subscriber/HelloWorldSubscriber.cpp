@@ -31,6 +31,12 @@ HelloWorldSubscriber::HelloWorldSubscriber()
 {
 }
 
+eprosima::fastrtps::types::DynamicType_ptr HelloWorldSubscriber::discoveredType()
+{
+    std::lock_guard<std::mutex> lock(m_listener.types_mx_);
+    return m_listener.received_type_;
+}
+
 bool HelloWorldSubscriber::init(
     const std::string &topic_name,
     TopicIDLStruct *topicIDLModel,

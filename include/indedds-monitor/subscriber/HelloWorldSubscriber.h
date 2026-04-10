@@ -51,6 +51,7 @@ public:
      */
     bool isRunning() const { return m_running; }
     const std::string& targetTopic() const { return m_targetTopic; }
+    eprosima::fastrtps::types::DynamicType_ptr discoveredType();
     // ========== END NEW METHODS ==========
 
 

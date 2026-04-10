@@ -898,23 +898,6 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
             default: break;
         }
 
-        // NOTE:
-        // Some transports may report RETCODE_ERROR even when a matched local/intra-process
-        // reader already consumed the sample (observable in logs as on_data_available).
-        // Avoid surfacing false negatives to the UI in that specific case.
-        PublicationMatchedStatus post_write_match_status;
-        if (writer->get_publication_matched_status(post_write_match_status) == ReturnCode_t::RETCODE_OK &&
-            post_write_match_status.current_count > 0 &&
-            ret == ReturnCode_t::RETCODE_ERROR)
-        {
-            std::cerr << "[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but "
-                      << post_write_match_status.current_count
-                      << " reader(s) are matched. Treating as non-fatal publish result." << std::endl;
-            std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
-            std::cout << "========================================" << std::endl;
-            return true;
-        }
-
         std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
         std::cout << "========================================" << std::endl;
         return false;
@@ -1417,5 +1400,37 @@ bool HelloWorldPublisher::initializeFromIDLText(const QString &idlText)
     }
 
     std::cout << "[initializeFromIDLText] ✓ DDS entities created via IDL fallback path" << std::endl;
+    return true;
+}
+
+bool HelloWorldPublisher::initializeFromDiscoveredType(
+    const eprosima::fastrtps::types::DynamicType_ptr& type,
+    const QString& source_tag)
+{
+    std::cout << "[initializeFromDiscoveredType] Called from "
+              << source_tag.toStdString() << std::endl;
+
+    if (!type)
+    {
+        std::cerr << "[initializeFromDiscoveredType] ✗ NULL DynamicType_ptr" << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(m_listener.types_mx_);
+        m_listener.received_type_ = type;
+        m_listener.reception_flag_.store(true);
+    }
+
+    initialize_entities();
+
+    if (!isReady())
+    {
+        std::cerr << "[initializeFromDiscoveredType] ✗ initialize_entities() produced incomplete state" << std::endl;
+        return false;
+    }
+
+    std::cout << "[initializeFromDiscoveredType] ✓ DDS entities created from discovered type: "
+              << type->get_name() << std::endl;
     return true;
 }

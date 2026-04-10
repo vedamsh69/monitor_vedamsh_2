@@ -52,6 +52,10 @@ public:
      */
     bool ensureInitialized(int timeout_ms = 5000);
 
+    bool initializeFromDiscoveredType(
+        const eprosima::fastrtps::types::DynamicType_ptr& type,
+        const QString& source_tag = QStringLiteral("unknown"));
+
     bool initializeFromIDLText(const QString &idlText);
 
     /*!

@@ -1250,6 +1250,24 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
         bool publisherReady = publisher->ensureInitialized(10000);
         qDebug() << "[Controller] ensureInitialized returned:" << publisherReady;
 
+        // Step 2b — Preferred fallback: initialize publisher from the exact
+        // discovered DynamicType captured by the discovery subscriber.
+        // This avoids potential wire-serialization mismatch caused by
+        // rebuilding a "similar" type from IDL text only.
+        if (!publisherReady)
+        {
+            auto discovered_type = subscriber->discoveredType();
+            if (discovered_type)
+            {
+                qDebug() << "[Controller] TypeLookup timeout — trying discovered DynamicType fallback:"
+                         << QString::fromStdString(discovered_type->get_name());
+                publisherReady = publisher->initializeFromDiscoveredType(
+                    discovered_type,
+                    QStringLiteral("Controller::startPublisherWithDiscovery"));
+                qDebug() << "[Controller] initializeFromDiscoveredType returned:" << publisherReady;
+            }
+        }
+
         // Step 3 — Fallback: build type from IDL text if TypeLookup timed out
         // (handles the case where no other DataWriter exists on the network,
         //  but a DataReader with TypeInformation was discovered by subscriber)
