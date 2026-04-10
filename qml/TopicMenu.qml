@@ -34,13 +34,40 @@ Menu {
 
     // ========== NEW: Track subscription state ==========
     property bool isSubscribed: false
+
+    function resolveDomainNumber(rawDomainId, rawDomainEntityId)
+    {
+        // 1) direct numeric parse
+        var direct = Number(rawDomainId)
+        if (!isNaN(direct) && isFinite(direct)) {
+            return Math.trunc(direct)
+        }
+
+        // 2) extract first integer from labels like "Domain 0"
+        var text = String(rawDomainId)
+        var match = text.match(/-?\d+/)
+        if (match && match.length > 0) {
+            var extracted = Number(match[0])
+            if (!isNaN(extracted) && isFinite(extracted)) {
+                return Math.trunc(extracted)
+            }
+        }
+
+        // 3) last resort: try domain entity id (some models may expose domain number there)
+        var fallback = Number(rawDomainEntityId)
+        if (!isNaN(fallback) && isFinite(fallback)) {
+            return Math.trunc(fallback)
+        }
+
+        return 0
+    }
     
     // Update subscription state when menu is about to show
     onAboutToShow: {
         console.log("[TopicMenu] Menu opening for topic:", currentAlias);
         console.log("[TopicMenu] Domain ID:", domainId);
         
-        var domain = parseInt(domainId);
+        var domain = resolveDomainNumber(domainId, domainEntityId);
         console.log("[TopicMenu] Parsed domain as integer:", domain);
         
         // Check if this topic is currently subscribed
@@ -71,7 +98,7 @@ Menu {
         text: topicMenu.isSubscribed ? "Unsubscribe" : "Subscribe"
         
         onTriggered: {
-            var domain = parseInt(topicMenu.domainId);
+            var domain = topicMenu.resolveDomainNumber(topicMenu.domainId, topicMenu.domainEntityId);
             
             console.log("[TopicMenu] Button clicked!");
             console.log("[TopicMenu] Current subscription status:", topicMenu.isSubscribed);
@@ -102,7 +129,12 @@ Menu {
         text: "Publish"
         onTriggered: {
             publishDialogid.topicname = menu.currentAlias;
-            publishDialogid.domainnumber = parseInt(menu.domainId);
+            publishDialogid.domainnumber = topicMenu.resolveDomainNumber(menu.domainId, menu.domainEntityId);
+            publishDialogid.selectedTopic = menu.currentAlias;
+            console.log("[TopicMenu] Publish clicked. domainId(raw)=", menu.domainId,
+                        "domainEntityId(raw)=", menu.domainEntityId,
+                        "resolvedDomain=", publishDialogid.domainnumber,
+                        "topic=", publishDialogid.topicname)
             publishDialogid.open();
         }
     }
