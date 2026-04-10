@@ -1021,7 +1021,7 @@ void Controller::startDynamicSubscriber(const QString &topicName)
     qDebug() << "[Controller::startDynamicSubscriber] Subscriber created at:" << subscriber;
     qDebug() << "[Controller::startDynamicSubscriber] Initializing subscriber...";
 
-    if (!subscriber->init(topic_name_std, topicIDLModel))
+    if (!subscriber->init(topic_name_std, topicIDLModel, domainId))
     {
         qCritical() << "[Controller::startDynamicSubscriber] Subscriber init failed!";
         delete subscriber;
@@ -1189,7 +1189,7 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
 
     // ── Create subscriber (for IDL text → editor display) ─────────────────
     HelloWorldSubscriber* subscriber = new HelloWorldSubscriber();
-    if (!subscriber->init(topicName.toStdString(), topicIDLModel_))
+    if (!subscriber->init(topicName.toStdString(), topicIDLModel_, domainId))
     {
         qCritical() << "[Controller] Failed to init discovery subscriber";
         emit publisherDiscoveryFailed(topicName, "Failed to create type-discovery subscriber");

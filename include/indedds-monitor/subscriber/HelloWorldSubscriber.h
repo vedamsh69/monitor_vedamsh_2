@@ -31,7 +31,10 @@ public:
     void print_type_structure(const eprosima::fastrtps::types::DynamicType_ptr &type, int indent = 0);
 
     // bool init(const std::string& topic_name, std::vector<std::string> submodel);
-    bool init(const std::string &topic_name, TopicIDLStruct *topicIDLModel);
+    bool init(
+        const std::string &topic_name,
+        TopicIDLStruct *topicIDLModel,
+        int domain_id = 0);
     void run();
     void run(uint32_t number);
     void runWithTimeout(uint32_t timeout_seconds);
