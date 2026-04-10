@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>fastdds_monitor</name>
+  <!-->There must be a release. Update version accordingly<-->
+  <version>2.1.0</version>
+  <description>
+    Qt application written in C++ that plot the data from the Fast DDS Statistics Backend.
+  </description>
+  <license file="LICENSE">GNU general public license</license>
+
+
+  <depend>cdr</depend>
+  <depend>rtps</depend>
+  <depend>Statistics</depend>
+
+  <buildtool_depend>cmake</buildtool_depend>
+
+  <doc_depend>doxygen</doc_depend>
+  <doc_depend>Sphinx</doc_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

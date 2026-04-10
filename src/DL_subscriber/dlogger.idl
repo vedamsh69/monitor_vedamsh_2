@@ -1,0 +1,26 @@
+module LoggingModule {
+
+    enum DL_Kind {
+        Error,
+        Warning,
+        Info,
+        Notice,
+        Debug
+    };
+
+    struct DL_Context {
+        string filename;
+        int32 line;
+        string function;
+        string category;
+    };
+
+    struct DL_Entry {
+        string host_id;
+        int32 process_id; 
+        string message;
+        DL_Context log_context;
+        DL_Kind kind;
+        string timestamp;
+    };
+};
