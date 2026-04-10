@@ -34,14 +34,6 @@ Rectangle {
                 console.log("[PublicationTab] Controller not available yet; waiting for binding update")
             }
         }
-        onControllerInstanceChanged: {
-            if (controllerInstance) {
-                publicationManager.controller = controllerInstance
-                console.log("[PublicationTab] ✓ Controller injected on change")
-            }
-        }
-
-
                         onLogMessage: function(message) {
                         pythonLogView.append(message)
                     }
