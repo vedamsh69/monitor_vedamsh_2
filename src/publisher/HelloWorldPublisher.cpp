@@ -22,8 +22,6 @@
 #include <fastrtps/types/DynamicTypeMember.h>
 
 using namespace eprosima::fastdds::dds;
-using eprosima::fastrtps::types::ReturnCode_t;
-
 // Define the global variable here
 std::string global_publisher_topic_name;
 
@@ -128,7 +126,7 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
         std::cout << "[DEBUG] DomainParticipant created successfully at " << mp_participant << std::endl;
     }
 
-    if (mp_participant->enable() != ReturnCode_t::RETCODE_OK)
+    if (mp_participant->enable() != eprosima::fastdds::dds::ReturnCode_t::RETCODE_OK)
     {
         std::cout << "[ERROR] Failed to enable DomainParticipant, deleting..." << std::endl;
         DomainParticipantFactory::get_instance()->delete_participant(mp_participant);
@@ -154,11 +152,11 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
         // Use broadly-compatible defaults so dynamic subscribers with default
         // settings can always match this writer.
         qos_ = DATAWRITER_QOS_DEFAULT;
-        qos_.reliability().kind = BEST_EFFORT_RELIABILITY_QOS;
+        qos_.reliability().kind = RELIABLE_RELIABILITY_QOS;
         qos_.durability().kind = VOLATILE_DURABILITY_QOS;
         qos_.ownership().kind = SHARED_OWNERSHIP_QOS;
         std::cout << "Using compatible default QoS settings: "
-                  << "BEST_EFFORT + VOLATILE + SHARED" << std::endl;
+                  << "RELIABLE + VOLATILE + SHARED" << std::endl;
     }
     else
     {
@@ -345,8 +343,8 @@ void HelloWorldPublisher::initialize_entities()
     {
         std::cout << "[DEBUG] Registering type with participant..." << std::endl;
         auto reg_ret = m_type_support_.register_type(mp_participant);
-        if (reg_ret != ReturnCode_t::RETCODE_OK &&
-                reg_ret != ReturnCode_t::RETCODE_PRECONDITION_NOT_MET)
+        if (reg_ret != eprosima::fastdds::dds::ReturnCode_t::RETCODE_OK &&
+                reg_ret != eprosima::fastdds::dds::ReturnCode_t::RETCODE_PRECONDITION_NOT_MET)
         {
             std::cout << "[ERROR] Failed to register type, code: " << static_cast<int>(reg_ret()) << std::endl;
             return;
@@ -478,7 +476,7 @@ void HelloWorldPublisher::publish_sample(const eprosima::fastrtps::types::Dynami
         DataWriter *writer = it.first;
         std::cout << "[DEBUG] Publishing sample using DataWriter at " << writer << std::endl;
 
-        if (writer->write(data.get()) == ReturnCode_t::RETCODE_OK)
+        if (writer->write(data.get()) == eprosima::fastdds::dds::ReturnCode_t::RETCODE_OK)
         {
             std::cout << "[DEBUG] Sample published successfully" << std::endl;
             std::cout << "Sample published" << std::endl;
@@ -792,7 +790,7 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
     std::cout << "[HelloWorldPublisher::writeSample] ✓ Valid DynamicData at " << dynamicData << std::endl;
 
     eprosima::fastdds::dds::PublicationMatchedStatus match_status;
-    if (writer->get_publication_matched_status(match_status) == ReturnCode_t::RETCODE_OK)
+    if (writer->get_publication_matched_status(match_status) == eprosima::fastdds::dds::ReturnCode_t::RETCODE_OK)
     {
         std::cout << "[HelloWorldPublisher::writeSample] Matched readers current_count="
                   << match_status.current_count << " total_count=" << match_status.total_count << std::endl;
@@ -848,9 +846,9 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
     std::cout << "[HelloWorldPublisher::writeSample] Writing sample to DDS..." << std::endl;
     std::cout << "[HelloWorldPublisher::writeSample] Topic name: " << global_publisher_topic_name << std::endl;
     
-    eprosima::fastrtps::types::ReturnCode_t ret = writer->write(dynamicData);
+    eprosima::fastdds::dds::ReturnCode_t ret = writer->write(dynamicData);
 
-    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
+    if (ret == eprosima::fastdds::dds::ReturnCode_t::RETCODE_OK)
     {
         std::cout << "[HelloWorldPublisher::writeSample] ✓ ✓ ✓ SUCCESS: SAMPLE PUBLISHED TO DDS!" << std::endl;
         std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
@@ -863,21 +861,12 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
         std::cerr << "[HelloWorldPublisher::writeSample] Write operation returned code: "
                   << static_cast<int>(ret()) << std::endl;
 
-        // NOTE:
-        // Some transports may report RETCODE_ERROR even when a matched local/intra-process
-        // reader already consumed the sample (observable in logs as on_data_available).
-        // Avoid surfacing false negatives to the UI in that specific case.
         PublicationMatchedStatus post_write_match_status;
-        if (writer->get_publication_matched_status(post_write_match_status) == ReturnCode_t::RETCODE_OK &&
-            post_write_match_status.current_count > 0 &&
-            ret == ReturnCode_t::RETCODE_ERROR)
+        if (writer->get_publication_matched_status(post_write_match_status) == eprosima::fastdds::dds::ReturnCode_t::RETCODE_OK)
         {
-            std::cerr << "[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but "
+            std::cerr << "[HelloWorldPublisher::writeSample] Post-write matched readers current_count="
                       << post_write_match_status.current_count
-                      << " reader(s) are matched. Treating as non-fatal publish result." << std::endl;
-            std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
-            std::cout << "========================================" << std::endl;
-            return true;
+                      << " total_count=" << post_write_match_status.total_count << std::endl;
         }
 
         std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
@@ -910,7 +899,7 @@ bool HelloWorldPublisher::setDynamicDataField(
     }
     std::cout << "[setDynamicDataField] ✓ Field found, member ID:" << memberId << std::endl;
 
-    ReturnCode_t ret = ReturnCode_t::RETCODE_ERROR;
+    eprosima::fastrtps::types::ReturnCode_t ret = eprosima::fastrtps::types::ReturnCode_t::RETCODE_ERROR;
 
     // ── String path ────────────────────────────────────────────────────────
     // Strings and chars are never numeric — handle first and return directly.
@@ -919,13 +908,13 @@ bool HelloWorldPublisher::setDynamicDataField(
         std::string strVal = value.toString().toStdString();
         std::cout << "[setDynamicDataField] Trying string: \"" << strVal << "\"" << std::endl;
         ret = data->set_string_value(strVal, memberId);
-        if (ret != ReturnCode_t::RETCODE_OK)
+        if (ret != eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
         {
             // Attempt wstring as fallback for string fields
             std::cout << "[setDynamicDataField] string failed, trying wstring..." << std::endl;
             ret = data->set_wstring_value(std::wstring(strVal.begin(), strVal.end()), memberId);
         }
-        if (ret != ReturnCode_t::RETCODE_OK)
+        if (ret != eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
         {
             std::cerr << "[setDynamicDataField] ✗ FAILED: " << fieldName << std::endl;
             return false;
@@ -937,7 +926,7 @@ bool HelloWorldPublisher::setDynamicDataField(
     if (value.type() == QVariant::Char)
     {
         ret = data->set_char8_value(value.toChar().toLatin1(), memberId);
-        if (ret != ReturnCode_t::RETCODE_OK)
+        if (ret != eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
         {
             std::cerr << "[setDynamicDataField] ✗ FAILED char: " << fieldName << std::endl;
             return false;
@@ -949,7 +938,7 @@ bool HelloWorldPublisher::setDynamicDataField(
     if (value.type() == QVariant::Bool)
     {
         ret = data->set_bool_value(value.toBool(), memberId);
-        if (ret != ReturnCode_t::RETCODE_OK)
+        if (ret != eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
         {
             std::cerr << "[setDynamicDataField] ✗ FAILED bool: " << fieldName << std::endl;
             return false;
@@ -981,7 +970,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // float32
     ret = data->set_float32_value(static_cast<float>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as float32" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -990,7 +979,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // float64
     ret = data->set_float64_value(numericVal, memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as float64" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -999,7 +988,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // int32
     ret = data->set_int32_value(static_cast<int32_t>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as int32" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -1008,7 +997,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // int64
     ret = data->set_int64_value(static_cast<int64_t>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as int64" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -1017,7 +1006,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // int16
     ret = data->set_int16_value(static_cast<int16_t>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as int16" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -1026,7 +1015,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // uint32
     ret = data->set_uint32_value(static_cast<uint32_t>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as uint32" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -1035,7 +1024,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // uint64
     ret = data->set_uint64_value(static_cast<uint64_t>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as uint64" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -1044,7 +1033,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // uint16
     ret = data->set_uint16_value(static_cast<uint16_t>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as uint16" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -1053,7 +1042,7 @@ bool HelloWorldPublisher::setDynamicDataField(
 
     // byte (uint8)
     ret = data->set_byte_value(static_cast<uint8_t>(numericVal), memberId);
-    if (ret == ReturnCode_t::RETCODE_OK) {
+    if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK) {
         std::cout << "[setDynamicDataField] ✓ Set as byte" << std::endl;
         std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
         return true;
@@ -1071,7 +1060,7 @@ bool HelloWorldPublisher::setDynamicDataField(
                      "Trying string fallback: \"" << numAsStr << "\"" << std::endl;
 
         ret = data->set_string_value(numAsStr, memberId);
-        if (ret == ReturnCode_t::RETCODE_OK)
+        if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
         {
             std::cout << "[setDynamicDataField] ✓ Set as string (numeric→string fallback)" << std::endl;
             std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
@@ -1082,7 +1071,7 @@ bool HelloWorldPublisher::setDynamicDataField(
         std::cout << "[setDynamicDataField] string fallback failed, trying wstring..." << std::endl;
         ret = data->set_wstring_value(
             std::wstring(numAsStr.begin(), numAsStr.end()), memberId);
-        if (ret == ReturnCode_t::RETCODE_OK)
+        if (ret == eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
         {
             std::cout << "[setDynamicDataField] ✓ Set as wstring (numeric→wstring fallback)" << std::endl;
             std::cout << "[setDynamicDataField] ✓ SUCCESS: " << fieldName << std::endl;
@@ -1167,7 +1156,7 @@ void HelloWorldPublisher::PartListener::on_type_information_received(
         std::string(type_name.c_str()),
         type_callback);
 
-    if (ret != ReturnCode_t::RETCODE_OK)
+    if (ret != eprosima::fastdds::dds::ReturnCode_t::RETCODE_OK)
     {
         std::cerr << "[PartListener] ✗ register_remote_type returned error code: "
                   << static_cast<int>(ret()) << std::endl;
@@ -1301,9 +1290,9 @@ HelloWorldPublisher::buildTypeFromIDL(const QString &idlText)
 
         if (member_builder)
         {
-            ReturnCode_t addRet = struct_builder->add_member(memberId++, fieldNameStd, member_builder);
+            eprosima::fastrtps::types::ReturnCode_t addRet = struct_builder->add_member(memberId++, fieldNameStd, member_builder);
             factory->delete_builder(member_builder);
-            if (addRet != ReturnCode_t::RETCODE_OK)
+            if (addRet != eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
                 std::cerr << "[buildTypeFromIDL] ✗ add_member failed for: " << fieldNameStd << std::endl;
             else
                 std::cout << "[buildTypeFromIDL]   + member[" << (memberId - 1) << "] "
