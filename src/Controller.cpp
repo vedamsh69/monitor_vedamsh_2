@@ -1311,12 +1311,18 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
                     qDebug() << "[Controller] ✓ Publisher ready — stored in map";
                     m_pendingDiscovery_.remove(key);
                     m_publisherMap[key] = publisher;
-                    if (m_discoverySubscriberMap_.contains(key) &&
-                        m_discoverySubscriberMap_[key] != subscriber)
+                    // Discovery subscriber is only needed to fetch type/IDL.
+                    // Keep it out of runtime publishing to avoid consuming
+                    // local loopback data and masking real external matches.
+                    if (subscriber)
                     {
-                        delete m_discoverySubscriberMap_[key];
+                        qDebug() << "[Controller] Deleting temporary discovery subscriber";
+                        delete subscriber;
                     }
-                    m_discoverySubscriberMap_[key] = subscriber;
+                    if (m_discoverySubscriberMap_.contains(key))
+                    {
+                        m_discoverySubscriberMap_.remove(key);
+                    }
                     if (!topicIDLModel_->textData().trimmed().isEmpty() &&
                         topicIDLModel_->topicName() == topicName)
                     {

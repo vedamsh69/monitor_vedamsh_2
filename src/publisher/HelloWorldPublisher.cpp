@@ -154,11 +154,13 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
         // Use broadly-compatible defaults so dynamic subscribers with default
         // settings can always match this writer.
         qos_ = DATAWRITER_QOS_DEFAULT;
-        qos_.reliability().kind = BEST_EFFORT_RELIABILITY_QOS;
+        // Reliable writer is compatible with both reliable and best-effort readers,
+        // while best-effort writer is NOT compatible with reliable readers.
+        qos_.reliability().kind = RELIABLE_RELIABILITY_QOS;
         qos_.durability().kind = VOLATILE_DURABILITY_QOS;
         qos_.ownership().kind = SHARED_OWNERSHIP_QOS;
         std::cout << "Using compatible default QoS settings: "
-                  << "BEST_EFFORT + VOLATILE + SHARED" << std::endl;
+                  << "RELIABLE + VOLATILE + SHARED" << std::endl;
     }
     else
     {
