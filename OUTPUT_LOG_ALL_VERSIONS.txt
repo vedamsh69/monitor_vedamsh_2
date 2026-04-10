@@ -1,0 +1,930 @@
+
+APPLICATION CURRENT TERMINAL LOGS:
+
+Topic :  ===========TemperatureDataTopic
+Trying to update an entity that did not exist
+Topic :  ===========TemperatureDataTopic
+Trying to update an entity that did not exist
+qml: Topic name : TemperatureDataTopic
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+[DEBUG] Entering Controller::domain_click
+[DEBUG] id = 0
+[DEBUG] Converted id to backend_id = 0
+Domain ID :  ===========0
+Domain ID :  ===========0
+[DEBUG] Exiting Controller::domain_click
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+[DEBUG] Entering Controller::topic_click
+[DEBUG] id = 17
+[DEBUG] Converted id to backend_id = 17
+Domain ID :  ===========0
+Topic :  ===========TemperatureDataTopic
+[DEBUG] Exiting Controller::topic_click
+qml: [TopicMenu] Menu opening for topic: TemperatureDataTopic
+qml: [TopicMenu] Domain ID: 0
+qml: [TopicMenu] Parsed domain as integer: 0
+qml: [TopicMenu] Subscription status: NOT SUBSCRIBED
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+qml: [PublishDialog::onAccepted] ========================================
+qml: [PublishDialog::onAccepted] OK Button clicked - Dialog accepted
+qml: [PublishDialog::onAccepted] Selected topic: TemperatureDataTopic
+qml: [PublishDialog::onAccepted] Domain ID: 0
+qml: [PublishDialog::onAccepted] ========================================
+qml: [PublishDialog::onAccepted] Starting type discovery...
+qml: [PublishDialog::onAccepted] Calling controller.startPublisherWithDiscovery()...
+[DEBUG] SubListener constructed, n_matched = 0, n_samples = 0, subscriber_ = valid
+[DEBUG] Entering HelloWorldSubscriber::init()
+[DEBUG] Input topic_name = TemperatureDataTopic
+[DEBUG] topicIDLModel pointer = 0x7ffd3d389288
+[DEBUG] Topic name set in model = TemperatureDataTopic
+[DEBUG] Retrieved model QoS values -> Reliability: , Durability: , Ownership: 
+[DEBUG] Setting factory_qos.entity_factory().autoenable_created_entities = 1
+[DEBUG] DomainParticipantFactory QoS set successfully
+[DEBUG] Participant name set = Participant_sub
+[DEBUG] Creating DomainParticipant with status mask (subscription_matched | data_available)
+[DEBUG] DomainParticipant created successfully at 0x326785d0
+[DEBUG] DomainParticipant enabled successfully
+Reliability from subscriber local variable : 
+durability from subscriber local variable : 
+ownership from subscriber local variable : 
+[DEBUG] isQoSSet = false
+Using default QoS settings: DATAREADER_QOS_DEFAULT
+[DEBUG] Exiting HelloWorldSubscriber::init() with return true
+[DEBUG] PubListener constructed, n_matched = 0, n_samples = 0, publisher_ = valid
+[DEBUG] Entering HelloWorldPublisher::init()
+[DEBUG] Input topic_name = TemperatureDataTopic
+[DEBUG] topicIDLModel pointer = 0x7ffd3d389288
+[DEBUG] domain_id = 0
+[DEBUG] Topic name set in model = TemperatureDataTopic
+[DEBUG] Retrieved model QoS values -> Reliability: , Durability: , Ownership: 
+[DEBUG] Setting factory_qos.entity_factory().autoenable_created_entities = 1
+[DEBUG] DomainParticipantFactory QoS set successfully
+[DEBUG] Participant name set = Participant_pub
+[DEBUG] TypeLookup client enabled
+[DEBUG] Creating DomainParticipant on domain 0 with StatusMask::all()
+[DEBUG] DomainParticipant created successfully at 0x324733a0
+[DEBUG] DomainParticipant enabled successfully
+Reliability from publisher local variable : 
+Durability from publisher local variable : 
+Ownership from publisher local variable : 
+[DEBUG] isQoSSet = false
+Using compatible default QoS settings: BEST_EFFORT + VOLATILE + SHARED
+[DEBUG] Exiting HelloWorldPublisher::init() with return true
+[DEBUG] Entering on_type_discovery()
+[DEBUG] Participant: 0x326785d0
+[DEBUG] SampleIdentity writer_guid: |GUID UNKNOWN|
+[DEBUG] Topic name received: TemperatureDataTopic
+[DEBUG] TypeIdentifier pointer: 0x794bc800d960
+[DEBUG] TypeObject pointer: 0x794bc800dac0
+[DEBUG] DynamicType pointer: 0x794bc80121b0
+[DEBUG] Discovered type name: TemperatureReading
+Discovered type: TemperatureReading from topic TemperatureDataTopic
+[DEBUG] Printing IDL structure of type: TemperatureReading
+IDL structure:
+[DEBUG] Entering print_type_structure() with type: TemperatureReading, indent: 0
+[DEBUG] Top-level call detected, clearing static stringstream
+[DEBUG] Fetching all members of type: TemperatureReading
+[DEBUG] Entering runWithTimeout() with timeout: [DEBUG] Found 12 seconds3
+qml: [PublishDialog::onAccepted] ✓ Discovery initiated, waiting for type discovery signal...
+[DEBUG] Waiting for type discovery with 12s timeout...
+qml: [PublishDialog::onAccepted] ========================================
+[DEBUG] Condition check: reception_flag_ =  members in type: 0TemperatureReading
+
+[DEBUG] Sorting members by ID
+[DEBUG] Processing member: temperature_value
+[DEBUG] Entering get_type_name() with TypeKind value: 
+
+[DEBUG] Matched TK_FLOAT64
+[DEBUG] Processing member: measurement_unit
+[DEBUG] Entering get_type_name() with TypeKind value:  
+[DEBUG] Matched TK_STRING8
+[DEBUG] Processing member: recorded_time
+[DEBUG] Entering get_type_name() with TypeKind value:  
+[DEBUG] Matched TK_STRING8
+[DEBUG] Top-level completed, setting TopicIDLStruct with accumulated structure
+[TopicIDLStruct] TextData updated, length: 113
+[TopicIDLStruct] ========== Starting IDL parsing ==========
+[TopicIDLStruct] ★★★ Starting IDL parsing ★★★
+[TopicIDLStruct] Input text:
+struct TemperatureReading {
+  double temperature_value;
+
+  string measurement_unit;
+
+  string recorded_time;
+
+};
+
+[TopicIDLStruct] Processing 5 lines
+[TopicIDLStruct] Line 0: 'struct TemperatureReading {'
+[TopicIDLStruct]   ✓ Found struct: TemperatureReading
+[TopicIDLStruct] Line 1: 'double temperature_value;'
+[TopicIDLStruct]   ✓ Added member: temperature_value (double), size=8
+[TopicIDLStruct] Line 2: 'string measurement_unit;'
+[TopicIDLStruct]   ✓ Added member: measurement_unit (string), size=256
+[TopicIDLStruct] Line 3: 'string recorded_time;'
+[TopicIDLStruct]   ✓ Added member: recorded_time (string), size=256
+[TopicIDLStruct] Line 4: '};'
+[TopicIDLStruct]   -> Found struct end
+[TopicIDLStruct] ★★★ SUCCESS! Root created with 3 children ★★★
+[TopicIDLStruct] ★★★ m_treeData size: 1 ★★★
+[TopicIDLStruct] ✓ Tree generated with 1 root nodes
+[DEBUG] ★★★ Calling parseIDLToTree() to populate tree view ★★★
+[TopicIDLStruct] ========== Starting IDL parsing ==========
+[TopicIDLStruct] ★★★ Starting IDL parsing ★★★
+[TopicIDLStruct] Input text:
+struct TemperatureReading {
+  double temperature_value;
+
+  string measurement_unit;
+
+  string recorded_time;
+
+};
+
+[TopicIDLStruct] Processing 5 lines
+[TopicIDLStruct] Line 0: 'struct TemperatureReading {'
+[TopicIDLStruct]   ✓ Found struct: TemperatureReading
+[TopicIDLStruct] Line 1: 'double temperature_value;'
+[TopicIDLStruct]   ✓ Added member: temperature_value (double), size=8
+[TopicIDLStruct] Line 2: 'string measurement_unit;'
+[TopicIDLStruct]   ✓ Added member: measurement_unit (string), size=256
+[TopicIDLStruct] Line 3: 'string recorded_time;'
+[TopicIDLStruct]   ✓ Added member: recorded_time (string), size=256
+[TopicIDLStruct] Line 4: '};'
+[TopicIDLStruct]   -> Found struct end
+[TopicIDLStruct] ★★★ SUCCESS! Root created with 3 children ★★★
+[TopicIDLStruct] ★★★ m_treeData size: 1 ★★★
+[TopicIDLStruct] ✓ Tree generated with 1 root nodes
+[DEBUG] Final generated structure:
+struct TemperatureReading {
+  double temperature_value;
+
+  string measurement_unit;
+
+  string recorded_time;
+
+};
+
+[DEBUG] Exiting print_type_structure()
+[DEBUG] Storing discovered DynamicType in received_type_
+[DEBUG] Setting reception_flag_ to true
+[DEBUG] Notifying waiting threads using condition variable
+[DEBUG] Exiting on_type_discovery()
+[DEBUG] Condition check: reception_flag_ = 1
+[DEBUG] ✓ Type discovered within 12s!
+[DEBUG] Entering initialize_entities()
+[DEBUG] Initializing DDS entities for type: TemperatureReading
+[DEBUG] Registering type with participant...
+[DEBUG] Type registered successfully.
+[DEBUG] Creating subscriber...
+[DEBUG] Subscriber created successfully.
+[DEBUG] Creating topic with name: TemperatureDataTopic and type: TemperatureReading
+[DEBUG] Topic created successfully: TemperatureDataTopic
+[DEBUG] Durability set to VOLATILE_DURABILITY_QOS 
+[DEBUG] Ownership set to SHARED_OWNERSHIP_QOS 
+[DEBUG] Reliability set to BEST_EFFORT_RELIABILITY_QOS 
+[DEBUG] Creating DataReader...
+qml: [CodeEditor] ========================================
+qml: [CodeEditor] ✓ sampleCodeChanged() signal received
+qml: [CodeEditor] New code length: 186
+qml: [CodeEditor] New code:
+qml: # Sample code for topic: TemperatureDataTopic
+# Type: TemperatureReading
+
+sample.measurement_unit = "example_string"
+sample.recorded_time = "example_string"
+sample.temperature_value = 0
+
+qml: [CodeEditor] ✓ TextEdit updated
+qml: [CodeEditor] Current TextEdit.text length: 186
+qml: [CodeEditor] ========================================
+[PartListener::on_type_information_received] ==============================
+[PartListener] topic_name  = TemperatureDataTopic
+[PartListener] type_name   = TemperatureReading
+[PartListener] our topic   = TemperatureDataTopic
+[PartListener] Calling participant->register_remote_type() ...
+qml: [TypeTreeViewTable] Tree data changed signal received
+qml: [TypeTreeViewTable] Loading tree data...
+[PartListener] ✗ register_remote_type returned error code: 11qml: [TypeTreeViewTable] Tree data items: 1
+
+[PartListener::on_type_information_received] ==============================
+qml: [TypeTreeViewTable] Adding root: TemperatureReading
+Durability Value : 0
+qml: [TypeTreeViewTable] Tree data changed signal received
+qml: [TypeTreeViewTable] Loading tree data...
+qml: [TypeTreeViewTable] Tree data items: 1
+qml: [TypeTreeViewTable] Adding root: TemperatureReading
+[PartListener::on_type_information_received] ==============================
+[PartListener] topic_name  = TemperatureDataTopic
+[PartListener] type_name   = TemperatureReading
+[PartListener] our topic   = TemperatureDataTopic
+[PartListener] Calling participant->register_remote_type() ...
+qml: [TypeTreeViewTable] Tree data changed signal received
+[PartListener::on_type_information_received] ==============================
+qml: [TypeTreeViewTable] Loading tree data...
+[DEBUG] DataReader created successfully for topic: TemperatureDataTopic
+[DEBUG] Creating DynamicData for type: TemperatureReading
+[DEBUG] DynamicData created and stored successfully.
+[DEBUG] Exiting initialize_entities()
+[DEBUG] Entering print_type_structure() with type: TemperatureReading, indent: 0
+[DEBUG] Top-level call detected, clearing static stringstream
+[DEBUG] Fetching all members of type: TemperatureReading
+[DEBUG] Found 3 members in type: TemperatureReading
+[DEBUG] Sorting members by ID
+[DEBUG] Processing member: temperature_value
+[DEBUG] Entering get_type_name() with TypeKind value: 
+
+[DEBUG] Matched TK_FLOAT64
+qml: [TypeTreeViewTable] Tree data items: 1
+[DEBUG] Processing member: measurement_unit
+qml: [TypeTreeViewTable] Adding root: TemperatureReading
+[DEBUG] Entering get_type_name() with TypeKind value:  
+[DEBUG] Matched TK_STRING8
+[DEBUG] Processing member: recorded_time
+[DEBUG] Entering get_type_name() with TypeKind value:  
+[DEBUG] Matched TK_STRING8
+[DEBUG] Top-level completed, setting TopicIDLStruct with accumulated structure
+[DEBUG] ★★★ Calling parseIDLToTree() to populate tree view ★★★
+[TopicIDLStruct] ========== Starting IDL parsing ==========
+[TopicIDLStruct] ★★★ Starting IDL parsing ★★★
+[TopicIDLStruct] Input text:
+struct TemperatureReading {
+  double temperature_value;
+
+  string measurement_unit;
+
+  string recorded_time;
+
+};
+
+[TopicIDLStruct] Processing 5 lines
+[TopicIDLStruct] Line 0: 'struct TemperatureReading {'
+[TopicIDLStruct]   ✓ Found struct: TemperatureReading
+[TopicIDLStruct] Line 1: 'double temperature_value;'
+[TopicIDLStruct]   ✓ Added member: temperature_value (double), size=8
+[TopicIDLStruct] Line 2: 'string measurement_unit;'
+[TopicIDLStruct]   ✓ Added member: measurement_unit (string), size=256
+[TopicIDLStruct] Line 3: 'string recorded_time;'
+[TopicIDLStruct]   ✓ Added member: recorded_time (string), size=256
+[TopicIDLStruct] Line 4: '};'
+[TopicIDLStruct]   -> Found struct end
+[TopicIDLStruct] ★★★ SUCCESS! Root created with 3 children ★★★
+[TopicIDLStruct] ★★★ m_treeData size: 1 ★★★
+[TopicIDLStruct] ✓ Tree generated with 1 root nodes
+[DEBUG] Final generated structure:
+struct TemperatureReading {
+  double temperature_value;
+
+  string measurement_unit;
+
+  string recorded_time;
+
+};
+
+[DEBUG] Exiting print_type_structure()
+[DEBUG] Entities initialized and IDL generated
+[DEBUG] Exiting runWithTimeout()
+[HelloWorldPublisher::ensureInitialized] Waiting for type discovery...
+[HelloWorldPublisher] Checking reception_flag_: 0
+qml: [TypeTreeViewTable] Tree data changed signal received
+qml: [TypeTreeViewTable] Loading tree data...
+qml: [TypeTreeViewTable] Tree data items: 1
+qml: [TypeTreeViewTable] Adding root: TemperatureReading
+Trying to update an entity that did not exist
+Trying to update an entity that did not exist
+Trying to update an entity that did not exist
+qml: [TypeTreeViewTable] Tree data changed signal received
+qml: [TypeTreeViewTable] Loading tree data...
+qml: [TypeTreeViewTable] Tree data items: 1
+qml: [TypeTreeViewTable] Adding root: TemperatureReading
+qml: [TypeTreeViewTable] Tree data changed signal received
+qml: [TypeTreeViewTable] Loading tree data...
+qml: [TypeTreeViewTable] Tree data items: 1
+qml: [TypeTreeViewTable] Adding root: TemperatureReading
+Trying to update an entity that did not exist
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+[HelloWorldPublisher] Checking reception_flag_: 0
+[HelloWorldPublisher::ensureInitialized] ✗ Type discovery timeout!
+[initializeFromIDLText] Called, IDL length=113
+[buildTypeFromIDL] Parsing IDL text (length=113)
+[buildTypeFromIDL] struct name = TemperatureReading
+[buildTypeFromIDL]   + member[0] temperature_value : double
+[buildTypeFromIDL]   + member[1] measurement_unit : string
+[buildTypeFromIDL]   + member[2] recorded_time : string
+[buildTypeFromIDL] ✓ Built DynamicType 'TemperatureReading' with 3 member(s)
+[DEBUG] Entering initialize_entities()
+[DEBUG] Initializing DDS entities for type: TemperatureReading
+[DEBUG] Registering type with participant...
+this is the kind value : Error
+DEFAULT: Another type with the same name 'TemperatureReading' is already registered. [Method: register_type] [Context: PARTICIPANT]
+[DEBUG] Type registered (or already registered).
+[DEBUG] Creating publisher...
+[DEBUG] Publisher created successfully
+[DEBUG] Creating topic with name: TemperatureDataTopic and type: TemperatureReading
+[DEBUG] Topic created successfully: TemperatureDataTopic
+[DEBUG] Durability set to VOLATILE_DURABILITY_QOS
+[DEBUG] Reliability set to BEST_EFFORT_RELIABILITY_QOS
+[DEBUG] Creating DataWriter...
+[PartListener::on_type_information_received] ==============================
+[PartListener] topic_name  = TemperatureDataTopic
+[PartListener] type_name   = TemperatureReading
+[PartListener] our topic   = TemperatureDataTopic
+[PartListener] Calling participant->register_remote_type() ...
+[PartListener::on_type_information_received] ==============================
+[DEBUG] on_publication_matched triggered
+[DEBUG] DataWriter pointer: 0x794b0006e240
+[DEBUG] PublicationMatchedStatus: current_count_change=1, total_count=1, total_count_change=1
+[DEBUG] Publisher matched, n_matched updated to 1
+Publisher matched with 1 subscriber(s)
+on Publisher DiscoveryTemperatureDataTopic
+Durability Value : 0
+[DEBUG] on_subscription_matched triggered
+[DEBUG] DataReader pointer: 0x794b000058f0
+[DEBUG] SubscriptionMatchedStatus: current_count_change=1, total_count=1, total_count_change=1
+[DEBUG] Subscriber matched, n_matched updated to 1
+Subscriber matched
+[DEBUG] DataWriter created successfully for topic: TemperatureDataTopic
+[DEBUG] Creating DynamicData for type: TemperatureReading
+[DEBUG] DynamicData created and stored successfully.
+[DEBUG] Exiting initialize_entities()
+[initializeFromIDLText] ✓ DDS entities created via IDL fallback path
+qml: [PublishDialog::TypeDiscovered] ========================================
+qml: [PublishDialog::TypeDiscovered] onPublisherTypeDiscovered() signal RECEIVED
+qml: [PublishDialog::TypeDiscovered] Topic name from signal: TemperatureDataTopic
+qml: [PublishDialog::TypeDiscovered] Our selected topic: TemperatureDataTopic
+qml: [PublishDialog::TypeDiscovered] ✓ MATCH! This is our topic
+qml: [PublishDialog::TypeDiscovered] Type discovery SUCCESS!
+qml: [PublishDialog::TypeDiscovered] topicIDLModel text data length: 113
+qml: [PublishDialog::TypeDiscovered] Opening Publication Tab...
+qml: [Main] ========================================
+qml: [Main] 🚀 openPublicationTab called
+qml: [Main] Topic: TemperatureDataTopic
+qml: [Main] Domain: 0
+qml: [Main] topicIDLModel: TopicIDLStruct(0x7ffd3d389288)
+qml: [Main] topicIDLModel.textData: struct TemperatureReading {
+  double temperature_value;
+
+  string measurement_unit;
+
+  string recorded_time;
+
+};
+
+qml: [Main] ========================================
+qml: [Main] ✓ Proceeding to open Publication Tab...
+qml: [PublicationTab] Topic name changed to: TemperatureDataTopic
+qml: [Main] ✓ topicIDLModel connected
+qml: [Main] ✓ controller connected to PublicationManager
+qml: [CodeEditor] ========================================
+qml: [CodeEditor] ✓ sampleCodeChanged() signal received
+qml: [CodeEditor] New code length: 186
+qml: [CodeEditor] New code:
+qml: # Sample code for topic: TemperatureDataTopic
+# Type: TemperatureReading
+
+sample.measurement_unit = "example_string"
+sample.recorded_time = "example_string"
+sample.temperature_value = 0
+
+qml: [CodeEditor] ✓ TextEdit updated
+qml: [CodeEditor] Current TextEdit.text length: 186
+qml: [CodeEditor] ========================================
+qml: [Main] ✓ Code generation triggered
+qml: [Main] ✓ Publication Tab opened
+qml: [Main] ========================================
+qml: [PublishDialog::TypeDiscovered] ✓ Publication Tab opened successfully
+qml: [PublishDialog::TypeDiscovered] ========================================
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+qml: ========================================
+qml: [PublicationTab::Execute] ==================================================
+qml: [PublicationTab::Execute] EXECUTE BUTTON CLICKED!
+qml: [PublicationTab::Execute] Topic name: TemperatureDataTopic
+qml: [PublicationTab::Execute] Domain ID: 0
+qml: [PublicationTab::Execute] Controller available: true
+qml: [PublicationTab::Execute] Code length: 168
+qml: [PublicationTab::Execute] Topic type: TemperatureReading
+qml: [PublicationTab::Execute] ==================================================
+qml: [PublicationTab::Execute] STEP 1: Parsing Python code...
+qml: [PublicationTab::Execute] STEP 1 RESULT: Parsed 3 fields
+qml: [PublicationTab::Execute] Sample data: {"measurement_unit":"celsius","recorded_time":"10","temperature_value":10}
+qml: [PublicationTab::Execute] ========================================
+qml: [PublicationTab::Execute] STEP 2: Adding sample to queue...
+qml: [PublicationTab::Execute] ✓ Sample #0 added to queue (total: 1)
+qml: [PublicationTab::Execute] ========================================
+qml: [PublicationTab::Execute] STEP 3: Publishing to DDS via Controller...
+qml: [PublicationTab::Execute] Calling controller.publishOneSample()...
+========================================
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] writeSample() CALLED
+[HelloWorldPublisher::writeSample] Sample has 3 fields
+[HelloWorldPublisher::writeSample] Fields:
+[HelloWorldPublisher::writeSample]   - measurement_unit, [HelloWorldPublisher::writeSample]   - celsius
+[HelloWorldPublisher::writeSample]   - recorded_time, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample]   - temperature_value, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample] ✓ DynamicData instances found:1
+[HelloWorldPublisher::writeSample] ✓ Valid DataWriter at 0x794b0006e240
+[HelloWorldPublisher::writeSample] ✓ Valid DynamicData at 0x794b00091c20
+[HelloWorldPublisher::writeSample] Matched readers current_count=1 total_count=1
+[HelloWorldPublisher::writeSample] Setting field: measurement_unit = "celsius" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: measurement_unit
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:1
+[setDynamicDataField] Trying string: "celsius"
+[setDynamicDataField] ✓ SUCCESS: measurement_unit
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: recorded_time = "10" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: recorded_time
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:2
+[setDynamicDataField] Trying string: "10"
+[setDynamicDataField] ✓ SUCCESS: recorded_time
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: temperature_value = 10 (int)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: temperature_value
+[setDynamicDataField] QVariant type: int
+[setDynamicDataField] ✓ Field found, member ID:0
+[setDynamicDataField] Numeric probe for field 'temperature_value' value=10 (QVariant:int)
+[setDynamicDataField] float32 failed, trying float64...
+[setDynamicDataField] ✓ Set as float64
+[setDynamicDataField] ✓ SUCCESS: temperature_value
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Summary: 3/3 fields set
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] Writing sample to DDS...
+[HelloWorldPublisher::writeSample] Topic name: TemperatureDataTopic
+[DEBUG] Entered on_data_available()
+[DEBUG] Looking up DataReader in datas_ map...
+[DEBUG] DataReader found in datas_ map.
+[DEBUG] Attempting to take next sample...
+[DEBUG] take_next_sample() returned RETCODE_OK.
+[DEBUG] Instance state is ALIVE_INSTANCE_STATE.
+[DEBUG] Incremented sample count: 1
+Received data of type TemperatureReading
+[DEBUG] Calling print_dynamic_data...
+[DEBUG] Entering print_dynamic_data with indent=0, itemcount=3
+[DEBUG] Processing item index 0
+[DEBUG] Got member_id=0
+[DEBUG] Processing member: temperature_value
+temperature_value: [DEBUG] Member kind=10
+[DEBUG] Float64 value: 10
+10
+[DEBUG] Finished processing member: temperature_value
+[DEBUG] Processing item index 1
+[DEBUG] Got member_id=1
+[DEBUG] Processing member: measurement_unit
+measurement_unit: [DEBUG] Member kind=32
+[DEBUG] String value: celsius
+"celsius"
+[DEBUG] Finished processing member: measurement_unit
+[DEBUG] Processing item index 2
+[DEBUG] Got member_id=2
+[DEBUG] Processing member: recorded_time
+recorded_time: [DEBUG] Member kind=32
+[DEBUG] String value: 10
+"10"
+[DEBUG] Finished processing member: recorded_time
+[DEBUG] Exiting print_dynamic_data with indent=0
+[DEBUG] Finished print_dynamic_data call.
+print_dynamic_data nantar  
+[DEBUG] Extracting selected fields (currently commented out).
+extractSelectedFields nantar  
+[DEBUG] Current time generated for timestamp.
+[DEBUG] Converted dynamic and selected field streams to QString.
+[DEBUG] SampleInfo string prepared.
+[DEBUG] Calling topicIDLModel->addSample with sample index 0
+qml: Selected fields are: 
+[DEBUG] Sample added to topicIDLModel successfully.
+Timestamp: 2026-04-10 14:51:19 1775812879 IST
+[DEBUG] Printing SampleInfo details...
+--- SampleInfo Details ---
+valid_data: true
+source_timestamp: 1775812879.189296824
+reception_timestamp: 1775812879.189327476
+instance_handle: 0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0
+publication_handle: 1.f.91.c2.db.dd.a8.cc.3.0.0.0.0.0.1.3
+instance_state: 1
+sample_rank: 0
+generation_rank: 0
+absolute_generation_rank: 0
+disposed_generation_count: 0
+no_writers_generation_count: 0
+sample_state: 2
+view_state: 1
+sample_identity: 01.0f.91.c2.db.dd.a8.cc.03.00.00.00|0.0.1.3|1
+related_sample_identity: |GUID UNKNOWN||18446744069414584320
+-------------------------
+
+[DEBUG] Finished printing SampleInfo details.
+[DEBUG] Exiting on_data_available()
+[HelloWorldPublisher::writeSample] ✗ ✗ ✗ CRITICAL: DDS write() FAILED!
+[HelloWorldPublisher::writeSample] Write operation returned code: 1
+[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but 1 reader(s) are matched. Treating as non-fatal publish result.
+[HelloWorldPublisher::writeSample] ========================================
+========================================
+qml: [PublicationTab::Execute] publishOneSample() returned: true
+qml: [PublicationTab::Execute] ✓ ✓ ✓ SUCCESS: SAMPLE PUBLISHED TO DDS!
+qml: [PublicationTab::Execute] ==================================================
+qml: ========================================
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+qml: [PublicationTab::StartStop] ==================================================
+qml: [PublicationTab::StartStop] Topic=TemperatureDataTopic, Domain=0, QueueSize=1
+qml: [PublicationTab::StartStop] START button clicked
+qml: [PublicationTab::StartStop] Opening period dialog...
+qml: [PublicationTab::StartStop] ==================================================
+qml: [PublicationTab::PeriodDialog] ========================================
+qml: [PublicationTab::PeriodDialog] START PUBLISHING confirmed
+qml: [PublicationTab::PeriodDialog] Period(ms): 700
+qml: [PublicationTab::PeriodDialog] Queue size: 1
+========================================
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] writeSample() CALLED
+[HelloWorldPublisher::writeSample] Sample has 3 fields
+[HelloWorldPublisher::writeSample] Fields:
+[HelloWorldPublisher::writeSample]   - measurement_unit, [HelloWorldPublisher::writeSample]   - celsius
+[HelloWorldPublisher::writeSample]   - recorded_time, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample]   - temperature_value, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample] ✓ DynamicData instances found:1
+[HelloWorldPublisher::writeSample] ✓ Valid DataWriter at 0x794b0006e240
+[HelloWorldPublisher::writeSample] ✓ Valid DynamicData at 0x794b00091c20
+[HelloWorldPublisher::writeSample] Matched readers current_count=1 total_count=1
+[HelloWorldPublisher::writeSample] Setting field: measurement_unit = "celsius" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: measurement_unit
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:1
+[setDynamicDataField] Trying string: "celsius"
+[setDynamicDataField] ✓ SUCCESS: measurement_unit
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: recorded_time = "10" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: recorded_time
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:2
+[setDynamicDataField] Trying string: "10"
+[setDynamicDataField] ✓ SUCCESS: recorded_time
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: temperature_value = 10 (int)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: temperature_value
+[setDynamicDataField] QVariant type: int
+[setDynamicDataField] ✓ Field found, member ID:0
+[setDynamicDataField] Numeric probe for field 'temperature_value' value=10 (QVariant:int)
+[setDynamicDataField] float32 failed, trying float64...
+[setDynamicDataField] ✓ Set as float64
+[setDynamicDataField] ✓ SUCCESS: temperature_value
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Summary: 3/3 fields set
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] Writing sample to DDS...
+[HelloWorldPublisher::writeSample] Topic name: TemperatureDataTopic
+[DEBUG] Entered on_data_available()
+[DEBUG] Looking up DataReader in datas_ map...
+[DEBUG] DataReader found in datas_ map.
+[DEBUG] Attempting to take next sample...
+[DEBUG] take_next_sample() returned RETCODE_OK.
+[DEBUG] Instance state is ALIVE_INSTANCE_STATE.
+[DEBUG] Incremented sample count: 2
+Received data of type TemperatureReading
+[DEBUG] Calling print_dynamic_data...
+[DEBUG] Entering print_dynamic_data with indent=0, itemcount=3
+[DEBUG] Processing item index 0
+[DEBUG] Got member_id=0
+[DEBUG] Processing member: temperature_value
+temperature_value: [DEBUG] Member kind=10
+[DEBUG] Float64 value: 10
+10
+[DEBUG] Finished processing member: temperature_value
+[DEBUG] Processing item index 1
+[DEBUG] Got member_id=1
+[DEBUG] Processing member: measurement_unit
+measurement_unit: [DEBUG] Member kind=32
+[DEBUG] String value: celsius
+"celsius"
+[DEBUG] Finished processing member: measurement_unit
+[DEBUG] Processing item index 2
+[DEBUG] Got member_id=2
+[DEBUG] Processing member: recorded_time
+recorded_time: [DEBUG] Member kind=32
+[DEBUG] String value: 10
+"10"
+[DEBUG] Finished processing member: recorded_time
+[DEBUG] Exiting print_dynamic_data with indent=0
+[DEBUG] Finished print_dynamic_data call.
+print_dynamic_data nantar  
+[DEBUG] Extracting selected fields (currently commented out).
+extractSelectedFields nantar  
+[DEBUG] Current time generated for timestamp.
+[DEBUG] Converted dynamic and selected field streams to QString.
+[DEBUG] SampleInfo string prepared.
+[DEBUG] Calling topicIDLModel->addSample with sample index 1
+qml: Selected fields are: 
+[DEBUG] Sample added to topicIDLModel successfully.
+Timestamp: 2026-04-10 14:51:23 1775812883 IST
+[DEBUG] Printing SampleInfo details...
+--- SampleInfo Details ---
+valid_data: true
+source_timestamp: 1775812883.780093324
+reception_timestamp: 1775812883.780103117
+instance_handle: 0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0
+publication_handle: 1.f.91.c2.db.dd.a8.cc.3.0.0.0.0.0.1.3
+instance_state: 1
+sample_rank: 0
+generation_rank: 0
+absolute_generation_rank: 0
+disposed_generation_count: 0
+no_writers_generation_count: 0
+sample_state: 2
+view_state: 2
+sample_identity: 01.0f.91.c2.db.dd.a8.cc.03.00.00.00|0.0.1.3|2
+related_sample_identity: |GUID UNKNOWN||18446744069414584320
+-------------------------
+
+[DEBUG] Finished printing SampleInfo details.
+[DEBUG] Exiting on_data_available()
+[HelloWorldPublisher::writeSample] ✗ ✗ ✗ CRITICAL: DDS write() FAILED!
+[HelloWorldPublisher::writeSample] Write operation returned code: 1
+[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but 1 reader(s) are matched. Treating as non-fatal publish result.
+[HelloWorldPublisher::writeSample] ========================================
+========================================
+qml: [Periodic Publish] Topic: TemperatureDataTopic Domain: 0
+qml: [Periodic Publish] Data: {"measurement_unit":"celsius","recorded_time":"10","temperature_value":10}
+qml: [PublicationTab::PeriodDialog] startPeriodicPublishing() invoked
+qml: [PublicationTab::PeriodDialog] ========================================
+QSqlQuery::exec: database not open
+qml: Updated - Filtered logs: 0 Displayed: 0
+========================================
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] writeSample() CALLED
+[HelloWorldPublisher::writeSample] Sample has 3 fields
+[HelloWorldPublisher::writeSample] Fields:
+[HelloWorldPublisher::writeSample]   - measurement_unit, [HelloWorldPublisher::writeSample]   - celsius
+[HelloWorldPublisher::writeSample]   - recorded_time, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample]   - temperature_value, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample] ✓ DynamicData instances found:1
+[HelloWorldPublisher::writeSample] ✓ Valid DataWriter at 0x794b0006e240
+[HelloWorldPublisher::writeSample] ✓ Valid DynamicData at 0x794b00091c20
+[HelloWorldPublisher::writeSample] Matched readers current_count=1 total_count=1
+[HelloWorldPublisher::writeSample] Setting field: measurement_unit = "celsius" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: measurement_unit
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:1
+[setDynamicDataField] Trying string: "celsius"
+[setDynamicDataField] ✓ SUCCESS: measurement_unit
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: recorded_time = "10" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: recorded_time
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:2
+[setDynamicDataField] Trying string: "10"
+[setDynamicDataField] ✓ SUCCESS: recorded_time
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: temperature_value = 10 (int)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: temperature_value
+[setDynamicDataField] QVariant type: int
+[setDynamicDataField] ✓ Field found, member ID:0
+[setDynamicDataField] Numeric probe for field 'temperature_value' value=10 (QVariant:int)
+[setDynamicDataField] float32 failed, trying float64...
+[setDynamicDataField] ✓ Set as float64
+[setDynamicDataField] ✓ SUCCESS: temperature_value
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Summary: 3/3 fields set
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] Writing sample to DDS...
+[HelloWorldPublisher::writeSample] Topic name: TemperatureDataTopic
+[DEBUG] Entered on_data_available()
+[DEBUG] Looking up DataReader in datas_ map...
+[DEBUG] DataReader found in datas_ map.
+[DEBUG] Attempting to take next sample...
+[DEBUG] take_next_sample() returned RETCODE_OK.
+[DEBUG] Instance state is ALIVE_INSTANCE_STATE.
+[DEBUG] Incremented sample count: 3
+Received data of type TemperatureReading
+[DEBUG] Calling print_dynamic_data...
+[DEBUG] Entering print_dynamic_data with indent=0, itemcount=3
+[DEBUG] Processing item index 0
+[DEBUG] Got member_id=0
+[DEBUG] Processing member: temperature_value
+temperature_value: [DEBUG] Member kind=10
+[DEBUG] Float64 value: 10
+10
+[DEBUG] Finished processing member: temperature_value
+[DEBUG] Processing item index 1
+[DEBUG] Got member_id=1
+[DEBUG] Processing member: measurement_unit
+measurement_unit: [DEBUG] Member kind=32
+[DEBUG] String value: celsius
+"celsius"
+[DEBUG] Finished processing member: measurement_unit
+[DEBUG] Processing item index 2
+[DEBUG] Got member_id=2
+[DEBUG] Processing member: recorded_time
+recorded_time: [DEBUG] Member kind=32
+[DEBUG] String value: 10
+"10"
+[DEBUG] Finished processing member: recorded_time
+[DEBUG] Exiting print_dynamic_data with indent=0
+[DEBUG] Finished print_dynamic_data call.
+print_dynamic_data nantar  
+[DEBUG] Extracting selected fields (currently commented out).
+extractSelectedFields nantar  
+[DEBUG] Current time generated for timestamp.
+[DEBUG] Converted dynamic and selected field streams to QString.
+[DEBUG] SampleInfo string prepared.
+[DEBUG] Calling topicIDLModel->addSample with sample index 2
+qml: Selected fields are: 
+[DEBUG] Sample added to topicIDLModel successfully.
+Timestamp: 2026-04-10 14:51:24 1775812884 IST
+[DEBUG] Printing SampleInfo details...
+--- SampleInfo Details ---
+valid_data: true
+source_timestamp: 1775812884.514233276
+reception_timestamp: 1775812884.514242346
+instance_handle: 0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0
+publication_handle: 1.f.91.c2.db.dd.a8.cc.3.0.0.0.0.0.1.3
+instance_state: 1
+sample_rank: 0
+generation_rank: 0
+absolute_generation_rank: 0
+disposed_generation_count: 0
+no_writers_generation_count: 0
+sample_state: 2
+view_state: 2
+sample_identity: 01.0f.91.c2.db.dd.a8.cc.03.00.00.00|0.0.1.3|3
+related_sample_identity: |GUID UNKNOWN||18446744069414584320
+-------------------------
+
+[DEBUG] Finished printing SampleInfo details.
+[DEBUG] Exiting on_data_available()
+[HelloWorldPublisher::writeSample] ✗ ✗ ✗ CRITICAL: DDS write() FAILED!
+[HelloWorldPublisher::writeSample] Write operation returned code: 1
+[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but 1 reader(s) are matched. Treating as non-fatal publish result.
+[HelloWorldPublisher::writeSample] ========================================
+========================================
+qml: [Periodic Publish] Topic: TemperatureDataTopic Domain: 0
+qml: [Periodic Publish] Data: {"measurement_unit":"celsius","recorded_time":"10","temperature_value":10}
+========================================
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] writeSample() CALLED
+[HelloWorldPublisher::writeSample] Sample has 3 fields
+[HelloWorldPublisher::writeSample] Fields:
+[HelloWorldPublisher::writeSample]   - measurement_unit, [HelloWorldPublisher::writeSample]   - celsius
+[HelloWorldPublisher::writeSample]   - recorded_time, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample]   - temperature_value, [HelloWorldPublisher::writeSample]   - 10
+[HelloWorldPublisher::writeSample] ✓ DynamicData instances found:1
+[HelloWorldPublisher::writeSample] ✓ Valid DataWriter at 0x794b0006e240
+[HelloWorldPublisher::writeSample] ✓ Valid DynamicData at 0x794b00091c20
+[HelloWorldPublisher::writeSample] Matched readers current_count=1 total_count=1
+[HelloWorldPublisher::writeSample] Setting field: measurement_unit = "celsius" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: measurement_unit
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:1
+[setDynamicDataField] Trying string: "celsius"
+[setDynamicDataField] ✓ SUCCESS: measurement_unit
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: recorded_time = "10" (string)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: recorded_time
+[setDynamicDataField] QVariant type: QString
+[setDynamicDataField] ✓ Field found, member ID:2
+[setDynamicDataField] Trying string: "10"
+[setDynamicDataField] ✓ SUCCESS: recorded_time
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Setting field: temperature_value = 10 (int)
+[setDynamicDataField] ========================================
+[setDynamicDataField] Setting field: temperature_value
+[setDynamicDataField] QVariant type: int
+[setDynamicDataField] ✓ Field found, member ID:0
+[setDynamicDataField] Numeric probe for field 'temperature_value' value=10 (QVariant:int)
+[setDynamicDataField] float32 failed, trying float64...
+[setDynamicDataField] ✓ Set as float64
+[setDynamicDataField] ✓ SUCCESS: temperature_value
+[HelloWorldPublisher::writeSample] ✓ Field set successfully
+[HelloWorldPublisher::writeSample] Summary: 3/3 fields set
+[HelloWorldPublisher::writeSample] ========================================
+[HelloWorldPublisher::writeSample] Writing sample to DDS...
+[HelloWorldPublisher::writeSample] Topic name: TemperatureDataTopic
+[DEBUG] Entered on_data_available()
+[DEBUG] Looking up DataReader in datas_ map...
+[DEBUG] DataReader found in datas_ map.
+[DEBUG] Attempting to take next sample...
+[DEBUG] take_next_sample() returned RETCODE_OK.
+[DEBUG] Instance state is ALIVE_INSTANCE_STATE.
+[DEBUG] Incremented sample count: 4
+Received data of type TemperatureReading
+[DEBUG] Calling print_dynamic_data...
+[DEBUG] Entering print_dynamic_data with indent=0, itemcount=3
+[DEBUG] Processing item index 0
+[DEBUG] Got member_id=0
+[DEBUG] Processing member: temperature_value
+temperature_value: [DEBUG] Member kind=10
+[DEBUG] Float64 value: 10
+10
+[DEBUG] Finished processing member: temperature_value
+[DEBUG] Processing item index 1
+[DEBUG] Got member_id=1
+[DEBUG] Processing member: measurement_unit
+measurement_unit: [DEBUG] Member kind=32
+[DEBUG] String value: celsius
+"celsius"
+[DEBUG] Finished processing member: measurement_unit
+[DEBUG] Processing item index 2
+[DEBUG] Got member_id=2
+[DEBUG] Processing member: recorded_time
+recorded_time: [DEBUG] Member kind=32
+[DEBUG] String value: 10
+"10"
+[DEBUG] Finished processing member: recorded_time
+[DEBUG] Exiting print_dynamic_data with indent=0
+[DEBUG] Finished print_dynamic_data call.
+print_dynamic_data nantar  
+[DEBUG] Extracting selected fields (currently commented out).
+extractSelectedFields nantar  
+[DEBUG] Current time generated for timestamp.
+[DEBUG] Converted dynamic and selected field streams to QString.
+[DEBUG] SampleInfo string prepared.
+[DEBUG] Calling topicIDLModel->addSample with sample index 3
+qml: Selected fields are: 
+[DEBUG] Sample added to topicIDLModel successfully.
+Timestamp: 2026-04-10 14:51:25 1775812885 IST
+[DEBUG] Printing SampleInfo details...
+--- SampleInfo Details ---
+valid_data: true
+source_timestamp: 1775812885.222274975
+reception_timestamp: 1775812885.222284316
+instance_handle: 0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0
+publication_handle: 1.f.91.c2.db.dd.a8.cc.3.0.0.0.0.0.1.3
+instance_state: 1
+sample_rank: 0
+generation_rank: 0
+absolute_generation_rank: 0
+disposed_generation_count: 0
+no_writers_generation_count: 0
+sample_state: 2
+view_state: 2
+sample_identity: 01.0f.91.c2.db.dd.a8.cc.03.00.00.00|0.0.1.3|4
+related_sample_identity: |GUID UNKNOWN||18446744069414584320
+-------------------------
+
+[DEBUG] Finished printing SampleInfo details.
+[DEBUG] Exiting on_data_available()
+[HelloWorldPublisher::writeSample] ✗ ✗ ✗ CRITICAL: DDS write() FAILED!
+[HelloWorldPublisher::writeSample] Write operation returned code: 1
+[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but 1 reader(s) are matched. Treating as non-fatal publish result.
+[HelloWorldPublisher::writeSample] ========================================
+========================================
+qml: [Periodic Publish] Topic: TemperatureDataTopic Domain: 0
+qml: [Periodic Publish] Data: {"measurement_unit":"celsius","recorded_time":"10","temperature_value":10}
+qml: [PublicationTab::StartStop] ==================================================
+qml: [PublicationTab::StartStop] Topic=TemperatureDataTopic, Domain=0, QueueSize=1
+qml: [PublicationTab::StartStop] STOP button clicked
+qml: [PublicationTab::StartStop] ==================================================
+
+DYNAMIC, SUBSCRIBER CURRENT TERMINAL LOGS:
+
+cdac-veddd@veddd:~/Downloads/TempSampleApp/build$ ./TemperatureSubscriber 
+Starting Temperature Subscriber.
+
