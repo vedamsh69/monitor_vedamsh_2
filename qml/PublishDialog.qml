@@ -133,6 +133,13 @@ Dialog {
                     }
 
                     // ========== UPDATED: Discovery-First Approach ==========
+                    onOpened: {
+                        console.log("[PublishDialog::onOpened] ========================================")
+                        console.log("[PublishDialog::onOpened] Popup opened for topic:", publishDialogid.topicname,
+                                    "domain:", publishDialogid.domainnumber)
+                        console.log("[PublishDialog::onOpened] ========================================")
+                    }
+
                     onAccepted: {
                         console.log("[PublishDialog::onAccepted] ========================================")
                         console.log("[PublishDialog::onAccepted] OK Button clicked - Dialog accepted")

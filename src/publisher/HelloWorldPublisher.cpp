@@ -151,14 +151,15 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
 
     if (!isQoSSet)
     {
-        // Use broadly-compatible defaults so dynamic subscribers with default
-        // settings can always match this writer.
+        // Use Fast DDS defaults for maximum interoperability.
+        // Keep the default RELIABLE writer reliability so RELIABLE readers
+        // can match (BEST_EFFORT writer cannot satisfy RELIABLE readers).
         qos_ = DATAWRITER_QOS_DEFAULT;
-        qos_.reliability().kind = BEST_EFFORT_RELIABILITY_QOS;
-        qos_.durability().kind = VOLATILE_DURABILITY_QOS;
-        qos_.ownership().kind = SHARED_OWNERSHIP_QOS;
-        std::cout << "Using compatible default QoS settings: "
-                  << "BEST_EFFORT + VOLATILE + SHARED" << std::endl;
+        std::cout << "Using default QoS settings: DATAWRITER_QOS_DEFAULT" << std::endl;
+        std::cout << "[DEBUG] Default writer reliability="
+                  << static_cast<int>(qos_.reliability().kind)
+                  << " durability=" << static_cast<int>(qos_.durability().kind)
+                  << " ownership=" << static_cast<int>(qos_.ownership().kind) << std::endl;
     }
     else
     {
@@ -317,6 +318,16 @@ void HelloWorldPublisher::PubListener::on_publication_matched(
     }
 }
 
+void HelloWorldPublisher::PubListener::on_offered_incompatible_qos(
+    DataWriter* writer,
+    const OfferedIncompatibleQosStatus& status)
+{
+    std::cerr << "[PubListener::on_offered_incompatible_qos] DataWriter=" << writer
+              << " total_count=" << status.total_count
+              << " total_count_change=" << status.total_count_change
+              << " last_policy_id=" << status.last_policy_id << std::endl;
+}
+
 void HelloWorldPublisher::initialize_entities()
 {
     auto type = m_listener.received_type_;
@@ -433,7 +444,12 @@ void HelloWorldPublisher::initialize_entities()
     }
 
     std::cout << "[DEBUG] Creating DataWriter..." << std::endl;
-    StatusMask pub_mask = StatusMask::publication_matched();
+    std::cout << "[DEBUG] DataWriter QoS offered: reliability="
+              << static_cast<int>(qos_.reliability().kind)
+              << " durability=" << static_cast<int>(qos_.durability().kind)
+              << " ownership=" << static_cast<int>(qos_.ownership().kind)
+              << std::endl;
+    StatusMask pub_mask = StatusMask::publication_matched() << StatusMask::offered_incompatible_qos();
     DataWriter *writer = mp_publisher->create_datawriter(
         topic,
         qos_,
@@ -863,21 +879,13 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
         std::cerr << "[HelloWorldPublisher::writeSample] Write operation returned code: "
                   << static_cast<int>(ret()) << std::endl;
 
-        // NOTE:
-        // Some transports may report RETCODE_ERROR even when a matched local/intra-process
-        // reader already consumed the sample (observable in logs as on_data_available).
-        // Avoid surfacing false negatives to the UI in that specific case.
         PublicationMatchedStatus post_write_match_status;
-        if (writer->get_publication_matched_status(post_write_match_status) == ReturnCode_t::RETCODE_OK &&
-            post_write_match_status.current_count > 0 &&
-            ret == ReturnCode_t::RETCODE_ERROR)
+        if (writer->get_publication_matched_status(post_write_match_status) == ReturnCode_t::RETCODE_OK)
         {
-            std::cerr << "[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but "
+            std::cerr << "[HelloWorldPublisher::writeSample] Post-write matched readers current_count="
                       << post_write_match_status.current_count
-                      << " reader(s) are matched. Treating as non-fatal publish result." << std::endl;
-            std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
-            std::cout << "========================================" << std::endl;
-            return true;
+                      << " total_count=" << post_write_match_status.total_count
+                      << std::endl;
         }
 
         std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
