@@ -66,6 +66,11 @@ onTopicNameChanged: {
     publicationManager.domainId = domainId
 }
 
+onDomainIdChanged: {
+    console.log("[PublicationTab] Domain ID changed to:", domainId)
+    publicationManager.domainId = domainId
+}
+
 
 // Main layout
 RowLayout {
@@ -245,9 +250,6 @@ RowLayout {
 
                     wrapMode: TextEdit.NoWrap
                     textFormat: TextEdit.PlainText
-                    onTextChanged: {
-                        console.log("[PublicationTab::Editor] Text changed. length=" + text.length)
-                    }
 
 
                     // ========== CRITICAL: Initialize empty ==========
