@@ -1147,8 +1147,8 @@ PublicationManager *Controller::createPublicationManager()
 
 void Controller::startPublisherWithDiscovery(const QString& topicName, int domainId)
 {
-    qDebug() << "[Controller::startPublisherWithDiscovery] topic=" << topicName
-            << "domain=" << domainId;
+    qDebug() << "[PublishFlow] [UI->Controller] Publish popup requested. topic=" << topicName
+             << "domain=" << domainId;
 
     if (!topicIDLModel_)
     {
@@ -1210,13 +1210,14 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
         return;
     }
     m_pendingDiscovery_.insert(key);
-    qDebug() << "[Controller] Subscriber + Publisher created, launching discovery thread";
+    qDebug() << "[PublishFlow] [Discovery] Subscriber + Publisher created, launching discovery thread";
 
     // ── Background thread ─────────────────────────────────────────────────
     // We never block the Qt main thread here.  All slow operations run below.
     std::thread discovery_thread([this, topicName, domainId, key, subscriber, publisher]()
     {
-        qDebug() << "[Controller] Discovery thread started";
+        qDebug() << "[PublishFlow] [Discovery] Thread started for topic" << topicName
+                 << "domain" << domainId;
 
         // Step 1 — Run subscriber to populate topicIDLModel->textData()
         // (blocks up to 5 s; also gives the publisher participant 5 s of
@@ -1242,22 +1243,23 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
                 }
             }
         }
-        qDebug() << "[Controller] Subscriber done. IDL text length=" << idlText.length();
+        qDebug() << "[PublishFlow] [Discovery] Subscriber phase complete. IDL text length="
+                 << idlText.length();
 
         // Step 2 — Wait for publisher TypeLookup (PRIMARY path)
         // If it already fired during the subscriber's 5 s window, this
         // returns immediately via the isReady() fast path.
         bool publisherReady = publisher->ensureInitialized(10000);
-        qDebug() << "[Controller] ensureInitialized returned:" << publisherReady;
+        qDebug() << "[PublishFlow] [Discovery] ensureInitialized returned:" << publisherReady;
 
         // Step 3 — Fallback: build type from IDL text if TypeLookup timed out
         // (handles the case where no other DataWriter exists on the network,
         //  but a DataReader with TypeInformation was discovered by subscriber)
         if (!publisherReady && !idlText.trimmed().isEmpty())
         {
-            qDebug() << "[Controller] TypeLookup failed — trying IDL text fallback";
+            qDebug() << "[PublishFlow] [Discovery] TypeLookup failed — trying IDL text fallback";
             publisherReady = publisher->initializeFromIDLText(idlText);
-            qDebug() << "[Controller] initializeFromIDLText returned:" << publisherReady;
+            qDebug() << "[PublishFlow] [Discovery] initializeFromIDLText returned:" << publisherReady;
         }
 
         // Step 3b — Built-in fallback for the Fast DDS HelloWorld example.
@@ -1290,7 +1292,7 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
             QMetaObject::invokeMethod(this,
                 [this, key, publisher, subscriber, topicName]()
                 {
-                    qDebug() << "[Controller] ✓ Publisher ready — stored in map";
+                    qDebug() << "[PublishFlow] [Discovery] ✓ Publisher ready — stored in map";
                     m_pendingDiscovery_.remove(key);
                     m_publisherMap[key] = publisher;
                     if (m_discoverySubscriberMap_.contains(key) &&
@@ -1321,7 +1323,7 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
             QMetaObject::invokeMethod(this,
                 [this, key, publisher, subscriber, topicName, reason]()
                 {
-                    qCritical() << "[Controller] ✗ Publisher NOT ready:" << reason;
+                    qCritical() << "[PublishFlow] [Discovery] ✗ Publisher NOT ready:" << reason;
                     m_pendingDiscovery_.remove(key);
                     if (m_discoverySubscriberMap_.contains(key) &&
                         m_discoverySubscriberMap_[key] == subscriber)
@@ -1335,11 +1337,11 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
                 Qt::QueuedConnection);
         }
 
-        qDebug() << "[Controller] Discovery thread exiting";
+        qDebug() << "[PublishFlow] [Discovery] Thread exiting";
     });
 
     discovery_thread.detach();
-    qDebug() << "[Controller] Discovery thread detached";
+    qDebug() << "[PublishFlow] [Discovery] Thread detached";
 }
 
 void Controller::destroyPublicationManager(PublicationManager *manager)
@@ -1434,6 +1436,8 @@ void Controller::unsubscribeFromTopic(int domainId, const QString &topicName)
 bool Controller::publishOneSample(const QString &topicName, int domainId,
                                   const QVariantMap &sampleData)
 {
+    qDebug() << "[PublishFlow] [Action] publishOneSample called. topic=" << topicName
+             << "domain=" << domainId << "fields=" << sampleData.size();
     // publishOneSample() must be a pure lookup + write — no blocking,
     // no participant creation, no type discovery.  All of that is done
     // once, ahead of time, in startPublisherWithDiscovery().
