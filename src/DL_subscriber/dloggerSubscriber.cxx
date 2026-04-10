@@ -122,7 +122,8 @@ bool dloggerSubscriber::initialize_database(sqlite3** db)
     return true;
 }
 
-bool dloggerSubscriber::init()
+bool dloggerSubscriber::init(
+    int domain_id)
 {
     std::cout << "[DEBUG] Entering dloggerSubscriber::init()" << std::endl;
 
@@ -130,8 +131,8 @@ bool dloggerSubscriber::init()
     pqos.name("Participant_sub");
     std::cout << "[DEBUG] DomainParticipantQos name set to: " << pqos.name() << std::endl;
 
-    std::cout << "[DEBUG] Creating DomainParticipant with domain ID = 0" << std::endl;
-    participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos);
+    std::cout << "[DEBUG] Creating DomainParticipant with domain ID = " << domain_id << std::endl;
+    participant_ = DomainParticipantFactory::get_instance()->create_participant(domain_id, pqos);
     if (participant_ == nullptr)
     {
         std::cerr << "[ERROR] Failed to create DomainParticipant." << std::endl;

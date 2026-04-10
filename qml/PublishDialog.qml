@@ -17,7 +17,14 @@ Dialog {
                 y: (parent.height - height) / 2
                 width: 720
 
-                property int defaultSpacing: 10
+    property int defaultSpacing: 10
+    onVisibleChanged: {
+        if (visible) {
+            console.log("[PublishDialog] OPENED for domain=" + publishDialogid.domainnumber + " topic=" + publishDialogid.topicname)
+        } else {
+            console.log("[PublishDialog] CLOSED")
+        }
+    }
 
                     Column {
                         id: col

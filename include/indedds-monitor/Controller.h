@@ -359,6 +359,7 @@ public slots:
      * @return true if published successfully, false otherwise
      */
     Q_INVOKABLE bool publishOneSample(const QString& topicName, int domainId, const QVariantMap& sampleData);
+    Q_INVOKABLE int currentMonitorDomain() const { return m_monitor_domain_id_; }
 
     /**
      * @brief Get the Match Analyses Model
@@ -444,6 +445,7 @@ private:
     // Map to store subscriber instances for cleanup: Key = <domainId, topicName>, Value = subscriber pointer
     QMap<QPair<int, QString>, HelloWorldSubscriber*> subscriberMap_;
     QMap<QPair<int, QString>, HelloWorldSubscriber*> m_discoverySubscriberMap_;
+    int m_monitor_domain_id_ = 0;
 };
 
 #endif // _EPROSIMA_FASTDDS_MONITOR_CONTROLLER_H

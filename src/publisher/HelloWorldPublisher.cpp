@@ -154,11 +154,13 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
         // Use broadly-compatible defaults so dynamic subscribers with default
         // settings can always match this writer.
         qos_ = DATAWRITER_QOS_DEFAULT;
-        qos_.reliability().kind = BEST_EFFORT_RELIABILITY_QOS;
+        // Reliable writer is compatible with both reliable and best-effort readers,
+        // while best-effort writer is NOT compatible with reliable readers.
+        qos_.reliability().kind = RELIABLE_RELIABILITY_QOS;
         qos_.durability().kind = VOLATILE_DURABILITY_QOS;
         qos_.ownership().kind = SHARED_OWNERSHIP_QOS;
         std::cout << "Using compatible default QoS settings: "
-                  << "BEST_EFFORT + VOLATILE + SHARED" << std::endl;
+                  << "RELIABLE + VOLATILE + SHARED" << std::endl;
     }
     else
     {
@@ -319,6 +321,7 @@ void HelloWorldPublisher::PubListener::on_publication_matched(
 
 void HelloWorldPublisher::initialize_entities()
 {
+    std::lock_guard<std::mutex> entities_lock(m_entities_mutex_);
     auto type = m_listener.received_type_;
     std::cout << "[DEBUG] Entering initialize_entities()" << std::endl;
 
@@ -350,6 +353,11 @@ void HelloWorldPublisher::initialize_entities()
         {
             std::cout << "[ERROR] Failed to register type, code: " << static_cast<int>(reg_ret()) << std::endl;
             return;
+        }
+        if (reg_ret == ReturnCode_t::RETCODE_PRECONDITION_NOT_MET)
+        {
+            std::cout << "[DEBUG] Type name already registered in participant. "
+                         "Reusing participant registration for topic creation." << std::endl;
         }
         m_type_registered_ = true;
         std::cout << "[DEBUG] Type registered (or already registered)." << std::endl;
@@ -731,7 +739,17 @@ bool HelloWorldPublisher::ensureInitialized(int timeout_ms)
     if (!discovered)
     {
         std::cerr << "[HelloWorldPublisher::ensureInitialized] ✗ Type discovery timeout!" << std::endl;
-        return false;
+        // Race-safe fallback: callback may have arrived right after wait_for timeout.
+        if (m_listener.received_type_)
+        {
+            std::cout << "[HelloWorldPublisher::ensureInitialized] "
+                         "Late type discovered after timeout window, proceeding to initialize entities."
+                      << std::endl;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     std::cout << "[HelloWorldPublisher::ensureInitialized] ✓ Type discovered, initializing entities..." << std::endl;
@@ -756,6 +774,7 @@ bool HelloWorldPublisher::ensureInitialized(int timeout_ms)
 // ========================================
 bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
 {
+    std::lock_guard<std::mutex> entities_lock(m_entities_mutex_);
     std::cout << "========================================" << std::endl;
     std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
     std::cout << "[HelloWorldPublisher::writeSample] writeSample() CALLED" << std::endl;
@@ -860,24 +879,25 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
     else
     {
         std::cerr << "[HelloWorldPublisher::writeSample] ✗ ✗ ✗ CRITICAL: DDS write() FAILED!" << std::endl;
+        int rc = static_cast<int>(ret());
         std::cerr << "[HelloWorldPublisher::writeSample] Write operation returned code: "
-                  << static_cast<int>(ret()) << std::endl;
-
-        // NOTE:
-        // Some transports may report RETCODE_ERROR even when a matched local/intra-process
-        // reader already consumed the sample (observable in logs as on_data_available).
-        // Avoid surfacing false negatives to the UI in that specific case.
-        PublicationMatchedStatus post_write_match_status;
-        if (writer->get_publication_matched_status(post_write_match_status) == ReturnCode_t::RETCODE_OK &&
-            post_write_match_status.current_count > 0 &&
-            ret == ReturnCode_t::RETCODE_ERROR)
+                  << rc << std::endl;
+        switch (rc)
         {
-            std::cerr << "[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but "
-                      << post_write_match_status.current_count
-                      << " reader(s) are matched. Treating as non-fatal publish result." << std::endl;
-            std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
-            std::cout << "========================================" << std::endl;
-            return true;
+            case 1: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_ERROR (generic serialization/type/write failure)" << std::endl; break;
+            case 4: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_PRECONDITION_NOT_MET" << std::endl; break;
+            case 5: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_OUT_OF_RESOURCES" << std::endl; break;
+            case 6: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_NOT_ENABLED" << std::endl; break;
+            case 7: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_IMMUTABLE_POLICY" << std::endl; break;
+            case 8: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_INCONSISTENT_POLICY" << std::endl; break;
+            case 9: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_ALREADY_DELETED" << std::endl; break;
+            case 10: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_TIMEOUT" << std::endl; break;
+            case 11: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_NO_DATA" << std::endl; break;
+            case 12: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_ILLEGAL_OPERATION" << std::endl; break;
+            case 13: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_NOT_ALLOWED_BY_SECURITY" << std::endl; break;
+            case 14: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_BAD_PARAMETER" << std::endl; break;
+            case 15: std::cerr << "[HelloWorldPublisher::writeSample] RETCODE_UNSUPPORTED" << std::endl; break;
+            default: break;
         }
 
         std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
@@ -1344,7 +1364,21 @@ bool HelloWorldPublisher::initializeFromIDLText(const QString &idlText)
         return false;
     }
 
-    eprosima::fastrtps::types::DynamicType_ptr type = buildTypeFromIDL(idlText);
+    // Prefer remotely-discovered type if it arrived late (avoids duplicate type-name registration mismatch).
+    eprosima::fastrtps::types::DynamicType_ptr type;
+    {
+        std::lock_guard<std::mutex> lock(m_listener.types_mx_);
+        type = m_listener.received_type_;
+    }
+    if (type)
+    {
+        std::cout << "[initializeFromIDLText] Reusing already discovered remote type: "
+                  << type->get_name() << std::endl;
+    }
+    else
+    {
+        type = buildTypeFromIDL(idlText);
+    }
     if (!type)
     {
         std::cerr << "[initializeFromIDLText] ✗ buildTypeFromIDL() failed" << std::endl;
@@ -1368,5 +1402,37 @@ bool HelloWorldPublisher::initializeFromIDLText(const QString &idlText)
     }
 
     std::cout << "[initializeFromIDLText] ✓ DDS entities created via IDL fallback path" << std::endl;
+    return true;
+}
+
+bool HelloWorldPublisher::initializeFromDiscoveredType(
+    const eprosima::fastrtps::types::DynamicType_ptr& type,
+    const QString& source_tag)
+{
+    std::cout << "[initializeFromDiscoveredType] Called from "
+              << source_tag.toStdString() << std::endl;
+
+    if (!type)
+    {
+        std::cerr << "[initializeFromDiscoveredType] ✗ NULL DynamicType_ptr" << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(m_listener.types_mx_);
+        m_listener.received_type_ = type;
+        m_listener.reception_flag_.store(true);
+    }
+
+    initialize_entities();
+
+    if (!isReady())
+    {
+        std::cerr << "[initializeFromDiscoveredType] ✗ initialize_entities() produced incomplete state" << std::endl;
+        return false;
+    }
+
+    std::cout << "[initializeFromDiscoveredType] ✓ DDS entities created from discovered type: "
+              << type->get_name() << std::endl;
     return true;
 }
