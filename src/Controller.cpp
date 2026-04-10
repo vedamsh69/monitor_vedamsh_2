@@ -1206,9 +1206,10 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
         return;
     }
 
-    // ── Create publisher (DDS entity creation + TypeLookup) ───────────────
-    // init() only creates the DomainParticipant and starts TypeLookup; it does
-    // NOT block.  The actual DataWriter is created later in ensureInitialized().
+    // ── Create publisher participant shell (non-blocking) ──────────────────
+    // init() only creates the DomainParticipant and configures writer QoS.
+    // The actual DataWriter is created later by initializeFromDiscoveredType()
+    // or initializeFromIDLText().
     HelloWorldPublisher* publisher = new HelloWorldPublisher();
     if (!publisher->init(topicName.toStdString(), domainId, topicIDLModel_))
     {

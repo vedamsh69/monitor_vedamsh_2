@@ -91,13 +91,15 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
     pqos.name("Participant_pub");
     std::cout << "[DEBUG] Participant name set = Participant_pub" << std::endl;
 
-    // Enable TypeLookup Service CLIENT so this participant can request full type
-    // definitions from other participants via the builtin TypeLookup endpoints.
-    // This is what triggers on_type_information_received when a matching
-    // DataWriter/DataReader is found on the network.
-    pqos.wire_protocol().builtin.typelookup_config.use_client = true;
+    // Keep publisher participant TypeLookup disabled.
+    // Runtime publish flow resolves type via the temporary discovery subscriber
+    // and then initializes publisher entities from that discovered DynamicType
+    // (or parsed IDL fallback). Enabling TypeLookup client here can race with
+    // that flow and trigger register_remote_type() for the same type name in
+    // this participant, causing duplicate/competing type registration states.
+    pqos.wire_protocol().builtin.typelookup_config.use_client = false;
     pqos.wire_protocol().builtin.typelookup_config.use_server = false;
-    std::cout << "[DEBUG] TypeLookup client enabled" << std::endl;
+    std::cout << "[DEBUG] TypeLookup client disabled for publisher participant" << std::endl;
 
     if (durability == "Transient")
     {
@@ -105,18 +107,17 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
         pqos.properties().properties().emplace_back("dds.persistence.plugin", "builtin.SQLITE3");
     }
 
-    // StatusMask::all() ensures publication_matched fires AND that
-    // on_type_information_received (which is mask-independent internally,
-    // but all() is safest) is never accidentally suppressed.
-    StatusMask par_mask = StatusMask::all();
+    // Publication matching happens on DataWriter listener.
+    // No participant-level callbacks are required for publisher init path.
+    StatusMask par_mask = StatusMask::none();
     std::cout << "[DEBUG] Creating DomainParticipant on domain " << domain_id
-              << " with StatusMask::all()" << std::endl;
+              << " with StatusMask::none()" << std::endl;
 
-    // Use m_participant_listener (member variable) — the file-scope PartListener
-    // was previously used here but had no on_type_information_received override,
-    // so received_type_ was never populated and initialize_entities() always bailed out.
+    // Keep participant listener detached in init to avoid participant-level
+    // type registration side effects; type bootstrap is managed explicitly by
+    // Controller (discovered DynamicType / IDL fallback).
     mp_participant = DomainParticipantFactory::get_instance()->create_participant(
-        domain_id, pqos, &m_participant_listener, par_mask);
+        domain_id, pqos, nullptr, par_mask);
 
     if (mp_participant == nullptr)
     {
