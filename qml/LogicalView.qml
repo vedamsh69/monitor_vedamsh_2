@@ -167,6 +167,7 @@ Rectangle {
 
                                     onClicked: {
                                         if(mouse.button & Qt.RightButton) {
+                                            console.log("[LogicalView] Right-click on topic => open Publish menu. Domain=" + domainId + " Topic=" + name + " EntityId=" + id)
                                             openTopicMenu(domainId, domainName, id, name, kind)
                                         } else {
                                             controller.topic_click(id)
