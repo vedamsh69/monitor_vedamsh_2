@@ -24,18 +24,16 @@ Rectangle {
 
         Component.onCompleted: {
             console.log("[PublicationTab] PublicationManager initialized")
-            if (typeof controller !== 'undefined' && controller !== null)
+            if (controllerInstance)
             {
-                publicationManager.controller = controller
+                publicationManager.controller = controllerInstance
                 console.log("[PublicationTab] ✓ Controller injected into PublicationManager")
             }
             else
             {
-                console.error("[PublicationTab] ✗ Controller unavailable during initialization")
+                console.log("[PublicationTab] Controller not available yet; waiting for binding update")
             }
         }
-
-
                         onLogMessage: function(message) {
                         pythonLogView.append(message)
                     }
@@ -63,6 +61,11 @@ Rectangle {
 onTopicNameChanged: {
     console.log("[PublicationTab] Topic name changed to:", topicName)
     publicationManager.topicName = topicName
+    publicationManager.domainId = domainId
+}
+
+onDomainIdChanged: {
+    console.log("[PublicationTab] Domain ID changed to:", domainId)
     publicationManager.domainId = domainId
 }
 
