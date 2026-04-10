@@ -24,14 +24,20 @@ Rectangle {
 
         Component.onCompleted: {
             console.log("[PublicationTab] PublicationManager initialized")
-            if (typeof controller !== 'undefined' && controller !== null)
+            if (controllerInstance)
             {
-                publicationManager.controller = controller
+                publicationManager.controller = controllerInstance
                 console.log("[PublicationTab] ✓ Controller injected into PublicationManager")
             }
             else
             {
-                console.error("[PublicationTab] ✗ Controller unavailable during initialization")
+                console.log("[PublicationTab] Controller not available yet; waiting for binding update")
+            }
+        }
+        onControllerInstanceChanged: {
+            if (controllerInstance) {
+                publicationManager.controller = controllerInstance
+                console.log("[PublicationTab] ✓ Controller injected on change")
             }
         }
 

@@ -36,6 +36,7 @@
 #include <QTimer>
 #include <thread>
 #include <chrono>
+#include <memory>
 // Admin Tool additions
 #include <QDir>
 #include <QFileInfo>
@@ -431,6 +432,7 @@ void Controller::init_monitor(
 {
     std::cout << "[DEBUG] Entering Controller::init_monitor(int)" << std::endl;
     std::cout << "[DEBUG] domain = " << domain << std::endl;
+    m_monitor_domain_id_ = domain;
 
     engine_->init_monitor(domain);
 
@@ -999,7 +1001,7 @@ void Controller::startDynamicSubscriber(const QString &topicName)
 
     qDebug() << "[Controller::startDynamicSubscriber] Got TopicIDLModel at" << topicIDLModel;
 
-    int domainId = 0; // TODO: Get actual domain ID
+    int domainId = m_monitor_domain_id_;
     qDebug() << "[Controller::startDynamicSubscriber] Using Domain ID:" << domainId;
 
     QPair<int, QString> key = qMakePair(domainId, topicName);
@@ -1091,14 +1093,19 @@ void *Controller::create_dl_subscriber(void *arg)
 {
     std::cout << "[DEBUG] Entered Controller::create_dl_subscriber" << std::endl;
     std::cout << "[DEBUG] Argument passed to create_dl_subscriber: " << arg << std::endl;
-
-    (void)arg; // Suppress unused parameter warning
+    int domain_id = 0;
+    if (arg != nullptr)
+    {
+        std::unique_ptr<int> domain_holder(static_cast<int*>(arg));
+        domain_id = *domain_holder;
+    }
+    std::cout << "[DEBUG] dloggerSubscriber domain id: " << domain_id << std::endl;
 
     std::cout << "[DEBUG] Creating dloggerSubscriber object..." << std::endl;
     dloggerSubscriber mysub2;
 
     std::cout << "[DEBUG] Calling dloggerSubscriber::init()" << std::endl;
-    if (mysub2.init())
+    if (mysub2.init(domain_id))
     {
         std::cout << "[DEBUG] dloggerSubscriber::init() returned true" << std::endl;
         std::cout << "[DEBUG] Calling dloggerSubscriber::run()" << std::endl;
@@ -1118,13 +1125,15 @@ void Controller::startDynamicDLSubscriber()
 {
     std::cout << "[DEBUG] Entered Controller::startDynamicDLSubscriber" << std::endl;
 
-    int result = pthread_create(&dlSubThread, nullptr, &Controller::create_dl_subscriber, nullptr);
+    int* domain_arg = new int(m_monitor_domain_id_);
+    int result = pthread_create(&dlSubThread, nullptr, &Controller::create_dl_subscriber, domain_arg);
     if (result == 0)
     {
         std::cout << "[DEBUG] pthread_create for dlSubThread succeeded." << std::endl;
     }
     else
     {
+        delete domain_arg;
         std::cerr << "[ERROR] pthread_create for dlSubThread failed with error code: " << result << std::endl;
     }
 
