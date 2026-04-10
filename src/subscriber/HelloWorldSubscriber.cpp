@@ -31,11 +31,21 @@ HelloWorldSubscriber::HelloWorldSubscriber()
 {
 }
 
-bool HelloWorldSubscriber::init(const std::string &topic_name, TopicIDLStruct *topicIDLModel)
+eprosima::fastrtps::types::DynamicType_ptr HelloWorldSubscriber::discoveredType()
+{
+    std::lock_guard<std::mutex> lock(m_listener.types_mx_);
+    return m_listener.received_type_;
+}
+
+bool HelloWorldSubscriber::init(
+    const std::string &topic_name,
+    TopicIDLStruct *topicIDLModel,
+    int domain_id)
 {
     std::cout << "[DEBUG] Entering HelloWorldSubscriber::init()" << std::endl;
     std::cout << "[DEBUG] Input topic_name = " << topic_name << std::endl;
     std::cout << "[DEBUG] topicIDLModel pointer = " << topicIDLModel << std::endl;
+    std::cout << "[DEBUG] Requested discovery domain_id = " << domain_id << std::endl;
 
     global_topic_name = topic_name;
     m_targetTopic = topic_name;
@@ -71,9 +81,11 @@ bool HelloWorldSubscriber::init(const std::string &topic_name, TopicIDLStruct *t
     }
 
     StatusMask par_mask = StatusMask::subscription_matched() << StatusMask::data_available();
-    std::cout << "[DEBUG] Creating DomainParticipant with status mask (subscription_matched | data_available)" << std::endl;
+    std::cout << "[DEBUG] Creating DomainParticipant on domain " << domain_id
+              << " with status mask (subscription_matched | data_available)" << std::endl;
 
-    mp_participant = DomainParticipantFactory::get_instance()->create_participant(0, pqos, &m_listener, par_mask);
+    mp_participant = DomainParticipantFactory::get_instance()->create_participant(
+        domain_id, pqos, &m_listener, par_mask);
 
     if (mp_participant == nullptr)
     {

@@ -52,6 +52,10 @@ public:
      */
     bool ensureInitialized(int timeout_ms = 5000);
 
+    bool initializeFromDiscoveredType(
+        const eprosima::fastrtps::types::DynamicType_ptr& type,
+        const QString& source_tag = QStringLiteral("unknown"));
+
     bool initializeFromIDLText(const QString &idlText);
 
     /*!
@@ -138,6 +142,7 @@ private:
     // (b) the destructor can clean up if DataWriter creation failed and the topic
     //     was never stored in the topics_ map.
     eprosima::fastdds::dds::Topic* m_current_topic = nullptr;
+    mutable std::mutex m_entities_mutex_;
 
     void initialize_entities();
     void publish_sample(const eprosima::fastrtps::types::DynamicData_ptr &data);

@@ -36,6 +36,7 @@
 #include <QTimer>
 #include <thread>
 #include <chrono>
+#include <memory>
 // Admin Tool additions
 #include <QDir>
 #include <QFileInfo>
@@ -431,6 +432,7 @@ void Controller::init_monitor(
 {
     std::cout << "[DEBUG] Entering Controller::init_monitor(int)" << std::endl;
     std::cout << "[DEBUG] domain = " << domain << std::endl;
+    m_monitor_domain_id_ = domain;
 
     engine_->init_monitor(domain);
 
@@ -999,7 +1001,7 @@ void Controller::startDynamicSubscriber(const QString &topicName)
 
     qDebug() << "[Controller::startDynamicSubscriber] Got TopicIDLModel at" << topicIDLModel;
 
-    int domainId = 0; // TODO: Get actual domain ID
+    int domainId = m_monitor_domain_id_;
     qDebug() << "[Controller::startDynamicSubscriber] Using Domain ID:" << domainId;
 
     QPair<int, QString> key = qMakePair(domainId, topicName);
@@ -1021,7 +1023,7 @@ void Controller::startDynamicSubscriber(const QString &topicName)
     qDebug() << "[Controller::startDynamicSubscriber] Subscriber created at:" << subscriber;
     qDebug() << "[Controller::startDynamicSubscriber] Initializing subscriber...";
 
-    if (!subscriber->init(topic_name_std, topicIDLModel))
+    if (!subscriber->init(topic_name_std, topicIDLModel, domainId))
     {
         qCritical() << "[Controller::startDynamicSubscriber] Subscriber init failed!";
         delete subscriber;
@@ -1091,14 +1093,19 @@ void *Controller::create_dl_subscriber(void *arg)
 {
     std::cout << "[DEBUG] Entered Controller::create_dl_subscriber" << std::endl;
     std::cout << "[DEBUG] Argument passed to create_dl_subscriber: " << arg << std::endl;
-
-    (void)arg; // Suppress unused parameter warning
+    int domain_id = 0;
+    if (arg != nullptr)
+    {
+        std::unique_ptr<int> domain_holder(static_cast<int*>(arg));
+        domain_id = *domain_holder;
+    }
+    std::cout << "[DEBUG] dloggerSubscriber domain id: " << domain_id << std::endl;
 
     std::cout << "[DEBUG] Creating dloggerSubscriber object..." << std::endl;
     dloggerSubscriber mysub2;
 
     std::cout << "[DEBUG] Calling dloggerSubscriber::init()" << std::endl;
-    if (mysub2.init())
+    if (mysub2.init(domain_id))
     {
         std::cout << "[DEBUG] dloggerSubscriber::init() returned true" << std::endl;
         std::cout << "[DEBUG] Calling dloggerSubscriber::run()" << std::endl;
@@ -1118,13 +1125,15 @@ void Controller::startDynamicDLSubscriber()
 {
     std::cout << "[DEBUG] Entered Controller::startDynamicDLSubscriber" << std::endl;
 
-    int result = pthread_create(&dlSubThread, nullptr, &Controller::create_dl_subscriber, nullptr);
+    int* domain_arg = new int(m_monitor_domain_id_);
+    int result = pthread_create(&dlSubThread, nullptr, &Controller::create_dl_subscriber, domain_arg);
     if (result == 0)
     {
         std::cout << "[DEBUG] pthread_create for dlSubThread succeeded." << std::endl;
     }
     else
     {
+        delete domain_arg;
         std::cerr << "[ERROR] pthread_create for dlSubThread failed with error code: " << result << std::endl;
     }
 
@@ -1189,7 +1198,7 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
 
     // ── Create subscriber (for IDL text → editor display) ─────────────────
     HelloWorldSubscriber* subscriber = new HelloWorldSubscriber();
-    if (!subscriber->init(topicName.toStdString(), topicIDLModel_))
+    if (!subscriber->init(topicName.toStdString(), topicIDLModel_, domainId))
     {
         qCritical() << "[Controller] Failed to init discovery subscriber";
         emit publisherDiscoveryFailed(topicName, "Failed to create type-discovery subscriber");
@@ -1250,6 +1259,24 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
         bool publisherReady = publisher->ensureInitialized(10000);
         qDebug() << "[Controller] ensureInitialized returned:" << publisherReady;
 
+        // Step 2b — Preferred fallback: initialize publisher from the exact
+        // discovered DynamicType captured by the discovery subscriber.
+        // This avoids potential wire-serialization mismatch caused by
+        // rebuilding a "similar" type from IDL text only.
+        if (!publisherReady)
+        {
+            auto discovered_type = subscriber->discoveredType();
+            if (discovered_type)
+            {
+                qDebug() << "[Controller] TypeLookup timeout — trying discovered DynamicType fallback:"
+                         << QString::fromStdString(discovered_type->get_name());
+                publisherReady = publisher->initializeFromDiscoveredType(
+                    discovered_type,
+                    QStringLiteral("Controller::startPublisherWithDiscovery"));
+                qDebug() << "[Controller] initializeFromDiscoveredType returned:" << publisherReady;
+            }
+        }
+
         // Step 3 — Fallback: build type from IDL text if TypeLookup timed out
         // (handles the case where no other DataWriter exists on the network,
         //  but a DataReader with TypeInformation was discovered by subscriber)
@@ -1293,12 +1320,18 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
                     qDebug() << "[Controller] ✓ Publisher ready — stored in map";
                     m_pendingDiscovery_.remove(key);
                     m_publisherMap[key] = publisher;
-                    if (m_discoverySubscriberMap_.contains(key) &&
-                        m_discoverySubscriberMap_[key] != subscriber)
+                    // Discovery subscriber is only needed to fetch type/IDL.
+                    // Keep it out of runtime publishing to avoid consuming
+                    // local loopback data and masking real external matches.
+                    if (subscriber)
                     {
-                        delete m_discoverySubscriberMap_[key];
+                        qDebug() << "[Controller] Deleting temporary discovery subscriber";
+                        delete subscriber;
                     }
-                    m_discoverySubscriberMap_[key] = subscriber;
+                    if (m_discoverySubscriberMap_.contains(key))
+                    {
+                        m_discoverySubscriberMap_.remove(key);
+                    }
                     if (!topicIDLModel_->textData().trimmed().isEmpty() &&
                         topicIDLModel_->topicName() == topicName)
                     {

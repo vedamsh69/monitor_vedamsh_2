@@ -37,7 +37,7 @@ public:
 
     virtual ~dloggerSubscriber();
 
-    bool init();
+    bool init(int domain_id = 0);
 
     void run();
 static bool initialize_database(sqlite3** db);

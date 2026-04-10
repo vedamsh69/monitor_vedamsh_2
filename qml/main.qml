@@ -324,6 +324,7 @@ function openPublicationTab(topicName, domainId)
     publicationTab.publicationManager.setTopicIDLModel(topicIDLModel)
     console.log("[Main] ✓ topicIDLModel connected")
     publicationTab.publicationManager.controller = controller
+    publicationTab.publicationManager.domainId = domainId
     console.log("[Main] ✓ controller connected to PublicationManager")
 
     // Trigger code generation (will use fallback if IDL not ready)

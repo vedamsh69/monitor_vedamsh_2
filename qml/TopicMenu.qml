@@ -38,10 +38,12 @@ Menu {
     // Update subscription state when menu is about to show
     onAboutToShow: {
         console.log("[TopicMenu] Menu opening for topic:", currentAlias);
-        console.log("[TopicMenu] Domain ID:", domainId);
-        
-        var domain = parseInt(domainId);
-        console.log("[TopicMenu] Parsed domain as integer:", domain);
+        console.log("[TopicMenu] Domain label:", domainId);
+        console.log("[TopicMenu] Domain entity id:", domainEntityId);
+
+        // Keep TopicMenu actions pinned to the monitor domain selected at app start.
+        var domain = controller.currentMonitorDomain();
+        console.log("[TopicMenu] Using monitor domain id:", domain);
         
         // Check if this topic is currently subscribed
         isSubscribed = controller.isTopicSubscribed(domain, currentAlias);
@@ -71,7 +73,7 @@ Menu {
         text: topicMenu.isSubscribed ? "Unsubscribe" : "Subscribe"
         
         onTriggered: {
-            var domain = parseInt(topicMenu.domainId);
+            var domain = controller.currentMonitorDomain();
             
             console.log("[TopicMenu] Button clicked!");
             console.log("[TopicMenu] Current subscription status:", topicMenu.isSubscribed);
@@ -102,7 +104,7 @@ Menu {
         text: "Publish"
         onTriggered: {
             publishDialogid.topicname = menu.currentAlias;
-            publishDialogid.domainnumber = parseInt(menu.domainId);
+            publishDialogid.domainnumber = controller.currentMonitorDomain();
             publishDialogid.open();
         }
     }
