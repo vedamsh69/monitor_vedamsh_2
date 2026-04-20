@@ -1293,16 +1293,24 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
                     qDebug() << "[Controller] ✓ Publisher ready — stored in map";
                     m_pendingDiscovery_.remove(key);
                     m_publisherMap[key] = publisher;
-                    if (m_discoverySubscriberMap_.contains(key) &&
-                        m_discoverySubscriberMap_[key] != subscriber)
-                    {
-                        delete m_discoverySubscriberMap_[key];
-                    }
-                    m_discoverySubscriberMap_[key] = subscriber;
                     if (!topicIDLModel_->textData().trimmed().isEmpty() &&
                         topicIDLModel_->topicName() == topicName)
                     {
                         m_topicIdlCache_[key] = topicIDLModel_->textData();
+                    }
+                    // Discovery subscriber is only needed during type/IDL discovery.
+                    // Keeping it alive causes local self-matching and can hide remote
+                    // matching problems in publish diagnostics.
+                    if (subscriber)
+                    {
+                        qDebug() << "[Controller] Cleaning up temporary discovery subscriber for"
+                                 << topicName << "domain" << key.first;
+                        delete subscriber;
+                    }
+                    if (m_discoverySubscriberMap_.contains(key))
+                    {
+                        delete m_discoverySubscriberMap_[key];
+                        m_discoverySubscriberMap_.remove(key);
                     }
                     emit publisherTypeDiscovered(topicName);
                 },
