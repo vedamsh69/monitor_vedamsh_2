@@ -12,7 +12,9 @@
 #include <QRegularExpression>
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/core/InstanceHandle.hpp>
 #include <fastdds/dds/publisher/qos/DataWriterQos.hpp>
+#include <fastdds/dds/topic/SubscriptionBuiltinTopicData.hpp>
 #include <fastrtps/attributes/ParticipantAttributes.h>
 #include <fastrtps/attributes/PublisherAttributes.h>
 #include <fastrtps/types/DynamicDataFactory.h>
@@ -59,10 +61,10 @@ HelloWorldPublisher::HelloWorldPublisher()
 
 bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, TopicIDLStruct *topicIDLModel)
 {
-    std::cout << "[DEBUG] Entering HelloWorldPublisher::init()" << std::endl;
-    std::cout << "[DEBUG] Input topic_name = " << topic_name << std::endl;
+    std::cout << "[PublishFlow] [init] Entering HelloWorldPublisher::init()" << std::endl;
+    std::cout << "[PublishFlow] [init] Input topic_name = " << topic_name << std::endl;
     std::cout << "[DEBUG] topicIDLModel pointer = " << topicIDLModel << std::endl;
-    std::cout << "[DEBUG] domain_id = " << domain_id << std::endl;
+    std::cout << "[PublishFlow] [init] domain_id = " << domain_id << std::endl;
     m_domainId = domain_id;
     m_topicNameStr = topic_name;
     global_publisher_topic_name = topic_name;
@@ -154,11 +156,11 @@ bool HelloWorldPublisher::init(const std::string &topic_name, int domain_id, Top
         // Use broadly-compatible defaults so dynamic subscribers with default
         // settings can always match this writer.
         qos_ = DATAWRITER_QOS_DEFAULT;
-        qos_.reliability().kind = BEST_EFFORT_RELIABILITY_QOS;
+        qos_.reliability().kind = RELIABLE_RELIABILITY_QOS;
         qos_.durability().kind = VOLATILE_DURABILITY_QOS;
         qos_.ownership().kind = SHARED_OWNERSHIP_QOS;
-        std::cout << "Using compatible default QoS settings: "
-                  << "BEST_EFFORT + VOLATILE + SHARED" << std::endl;
+        std::cout << "[PublishFlow] [init] Using default dynamic-writer QoS: "
+                  << "RELIABLE + VOLATILE + SHARED" << std::endl;
     }
     else
     {
@@ -320,11 +322,11 @@ void HelloWorldPublisher::PubListener::on_publication_matched(
 void HelloWorldPublisher::initialize_entities()
 {
     auto type = m_listener.received_type_;
-    std::cout << "[DEBUG] Entering initialize_entities()" << std::endl;
+    std::cout << "[PublishFlow] [initialize_entities] Entering" << std::endl;
 
     if (!type)
     {
-        std::cout << "[ERROR] No type received in listener. Cannot initialize entities." << std::endl;
+        std::cout << "[PublishFlow] [initialize_entities] [ERROR] No type received in listener. Cannot initialize entities." << std::endl;
         return;
     }
 
@@ -343,13 +345,19 @@ void HelloWorldPublisher::initialize_entities()
 
     if (!m_type_registered_)
     {
-        std::cout << "[DEBUG] Registering type with participant..." << std::endl;
+        std::cout << "[PublishFlow] [initialize_entities] Registering type with participant..." << std::endl;
         auto reg_ret = m_type_support_.register_type(mp_participant);
         if (reg_ret != ReturnCode_t::RETCODE_OK &&
                 reg_ret != ReturnCode_t::RETCODE_PRECONDITION_NOT_MET)
         {
             std::cout << "[ERROR] Failed to register type, code: " << static_cast<int>(reg_ret()) << std::endl;
             return;
+        }
+        if (reg_ret == ReturnCode_t::RETCODE_PRECONDITION_NOT_MET)
+        {
+            std::cout << "[PublishFlow] [initialize_entities] Type already registered in participant: "
+                      << m_type_support_.get_type_name()
+                      << " (continuing with existing registration)" << std::endl;
         }
         m_type_registered_ = true;
         std::cout << "[DEBUG] Type registered (or already registered)." << std::endl;
@@ -432,7 +440,14 @@ void HelloWorldPublisher::initialize_entities()
         break;
     }
 
-    std::cout << "[DEBUG] Creating DataWriter..." << std::endl;
+    if (!datas_.empty())
+    {
+        std::cout << "[PublishFlow] [initialize_entities] DataWriter/DynamicData already exist. "
+                  << "Skipping duplicate DataWriter creation. writers=" << datas_.size() << std::endl;
+        return;
+    }
+
+    std::cout << "[PublishFlow] [initialize_entities] Creating DataWriter..." << std::endl;
     StatusMask pub_mask = StatusMask::publication_matched();
     DataWriter *writer = mp_publisher->create_datawriter(
         topic,
@@ -466,7 +481,7 @@ void HelloWorldPublisher::initialize_entities()
     datas_[writer] = data;
     std::cout << "[DEBUG] DynamicData created and stored successfully." << std::endl;
 
-    std::cout << "[DEBUG] Exiting initialize_entities()" << std::endl;
+    std::cout << "[PublishFlow] [initialize_entities] Ready. writers=" << datas_.size() << std::endl;
 }
 
 void HelloWorldPublisher::publish_sample(const eprosima::fastrtps::types::DynamicData_ptr &data)
@@ -714,7 +729,9 @@ bool HelloWorldPublisher::ensureInitialized(int timeout_ms)
         std::cout << "[ensureInitialized] Already initialized, returning immediately" << std::endl;
         return true;
     }
-    std::cout << "[HelloWorldPublisher::ensureInitialized] Waiting for type discovery..." << std::endl;
+    std::cout << "[PublishFlow] [ensureInitialized] Waiting for type discovery for topic='"
+              << m_topicNameStr << "' domain=" << m_domainId
+              << " timeout_ms=" << timeout_ms << std::endl;
     
     // Wait for type discovery with timeout
     std::unique_lock<std::mutex> lock(m_listener.types_mx_);  //  FIXED: types_mx_
@@ -730,7 +747,8 @@ bool HelloWorldPublisher::ensureInitialized(int timeout_ms)
 
     if (!discovered)
     {
-        std::cerr << "[HelloWorldPublisher::ensureInitialized] ✗ Type discovery timeout!" << std::endl;
+        std::cerr << "[PublishFlow] [ensureInitialized] ✗ Type discovery timeout for topic='"
+                  << m_topicNameStr << "'" << std::endl;
         return false;
     }
 
@@ -798,6 +816,26 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
                   << match_status.current_count << " total_count=" << match_status.total_count << std::endl;
     }
 
+    eprosima::fastdds::dds::InstanceHandleSeq matched_handles;
+    if (writer->get_matched_subscriptions(matched_handles) == ReturnCode_t::RETCODE_OK)
+    {
+        std::cout << "[PublishFlow] [writeSample] Matched subscription handles="
+                  << matched_handles.size() << std::endl;
+        for (size_t i = 0; i < matched_handles.size(); ++i)
+        {
+            eprosima::fastdds::dds::SubscriptionBuiltinTopicData sub_data;
+            if (writer->get_matched_subscription_data(sub_data, matched_handles[i]) == ReturnCode_t::RETCODE_OK)
+            {
+                std::cout << "[PublishFlow] [writeSample]   match[" << i
+                          << "] topic='" << sub_data.topic_name()
+                          << "' type='" << sub_data.type_name()
+                          << "' reliability=" << static_cast<int>(sub_data.reliability().kind)
+                          << " durability=" << static_cast<int>(sub_data.durability().kind)
+                          << std::endl;
+            }
+        }
+    }
+
     // Set each field from the QVariantMap
     bool allFieldsSet = true;
     int successCount = 0;
@@ -863,22 +901,9 @@ bool HelloWorldPublisher::writeSample(const QVariantMap& sampleData)
         std::cerr << "[HelloWorldPublisher::writeSample] Write operation returned code: "
                   << static_cast<int>(ret()) << std::endl;
 
-        // NOTE:
-        // Some transports may report RETCODE_ERROR even when a matched local/intra-process
-        // reader already consumed the sample (observable in logs as on_data_available).
-        // Avoid surfacing false negatives to the UI in that specific case.
-        PublicationMatchedStatus post_write_match_status;
-        if (writer->get_publication_matched_status(post_write_match_status) == ReturnCode_t::RETCODE_OK &&
-            post_write_match_status.current_count > 0 &&
-            ret == ReturnCode_t::RETCODE_ERROR)
-        {
-            std::cerr << "[HelloWorldPublisher::writeSample] ⚠ write() returned RETCODE_ERROR but "
-                      << post_write_match_status.current_count
-                      << " reader(s) are matched. Treating as non-fatal publish result." << std::endl;
-            std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
-            std::cout << "========================================" << std::endl;
-            return true;
-        }
+        std::cerr << "[PublishFlow] [writeSample] write() failed and is treated as FAILURE." << std::endl;
+        std::cerr << "[PublishFlow] [writeSample] Check matched subscription dump above to verify whether "
+                  << "only the local discovery reader is matched vs external subscriber." << std::endl;
 
         std::cout << "[HelloWorldPublisher::writeSample] ========================================" << std::endl;
         std::cout << "========================================" << std::endl;
