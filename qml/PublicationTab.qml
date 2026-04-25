@@ -125,6 +125,7 @@ RowLayout {
                             {
                                 console.log("[PublicationTab::StartStop] STOP button clicked")
                                 publicationManager.stopPeriodicPublishing()
+                                pythonLogView.append("⏸ Stop Publishing clicked")
                             } else {
                             console.log("[PublicationTab::StartStop] START button clicked")
                             console.log("[PublicationTab::StartStop] Opening period dialog...")
@@ -265,6 +266,10 @@ RowLayout {
                             console.log("[CodeEditor] ✓ Initial text SET")
                         } else {
                         console.log("[CodeEditor] ⚠ sampleCode is empty, waiting...")
+                    }
+
+                    onTextChanged: {
+                        console.log("[CodeEditor] USER_EDIT: code changed; length=" + text.length)
                     }
                 }
 

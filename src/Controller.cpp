@@ -1149,6 +1149,7 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
 {
     qDebug() << "[Controller::startPublisherWithDiscovery] topic=" << topicName
             << "domain=" << domainId;
+    qDebug() << "[Controller::startPublisherWithDiscovery] USER_ACTION: TopicMenu->Publish accepted";
 
     if (!topicIDLModel_)
     {
@@ -1217,6 +1218,7 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
     std::thread discovery_thread([this, topicName, domainId, key, subscriber, publisher]()
     {
         qDebug() << "[Controller] Discovery thread started";
+        qDebug() << "[Controller] Discovery lifecycle: runWithTimeout -> ensureInitialized -> fallback-if-needed";
 
         // Step 1 — Run subscriber to populate topicIDLModel->textData()
         // (blocks up to 5 s; also gives the publisher participant 5 s of
@@ -1243,6 +1245,10 @@ void Controller::startPublisherWithDiscovery(const QString& topicName, int domai
             }
         }
         qDebug() << "[Controller] Subscriber done. IDL text length=" << idlText.length();
+        if (!idlText.trimmed().isEmpty())
+        {
+            qDebug() << "[Controller] Discovered/generated IDL preview:\n" << idlText;
+        }
 
         // Step 2 — Wait for publisher TypeLookup (PRIMARY path)
         // If it already fired during the subscriber's 5 s window, this
@@ -1515,6 +1521,7 @@ bool Controller::publishOneSample(const QString &topicName, int domainId,
     qDebug() << "[Controller::publishOneSample] Writing sample to"
             << topicName << "domain" << domainId
             << "fields=" << sampleData.size();
+    qDebug() << "[Controller::publishOneSample] Payload =" << sampleData;
 
     bool success = publisher->writeSample(sampleData);
 

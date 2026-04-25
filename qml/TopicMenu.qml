@@ -101,9 +101,14 @@ Menu {
     MenuItem {
         text: "Publish"
         onTriggered: {
+            console.log("[TopicMenu::Publish] ========================================")
+            console.log("[TopicMenu::Publish] USER_ACTION: Right-click topic -> Publish")
+            console.log("[TopicMenu::Publish] Topic:", menu.currentAlias, "Domain:", menu.domainId)
             publishDialogid.topicname = menu.currentAlias;
             publishDialogid.domainnumber = parseInt(menu.domainId);
             publishDialogid.open();
+            console.log("[TopicMenu::Publish] Publish dialog opened")
+            console.log("[TopicMenu::Publish] ========================================")
         }
     }
 }
